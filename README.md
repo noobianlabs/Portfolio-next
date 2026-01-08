@@ -4,6 +4,16 @@ If you find a bug. Please report it in the issue tracker and enjoy the website! 
 
 You can see the production version [here](https://abdullahsaleh.com/)!
 
+## Branching Strategy
+
+To keep the production environment stable, follow this branching model:
+- `main`: Production-ready code.
+- `feat/`: New features (e.g., `feat/contact-form`).
+- `fix/`: Bug fixes.
+- `chore/`: Maintenance (dependencies, config, etc.).
+
+**Before pushing to main:** Run the Antigravity workflow `/safe-push`.
+
 ## Installing dependencies
 To install all the dependencies, run the following command:
 ```
