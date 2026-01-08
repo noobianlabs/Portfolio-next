@@ -14,7 +14,7 @@ class ApplicationContext {
   constructor(
     public readonly path: string,
     public readonly compositor: LocalWindowCompositor
-  ) {}
+  ) { }
 }
 
 export interface ApplicationConfig {
@@ -60,7 +60,7 @@ export abstract class Application {
     public readonly compositor: LocalWindowCompositor,
     public readonly manager: LocalApplicationManager,
     public readonly apis: SystemAPIs
-  ) {}
+  ) { }
 
   private windowListeners: Record<number, ApplicationWindowListener[]> = {};
 
@@ -207,7 +207,7 @@ export class ApplicationManager implements BaseApplicationManager {
 
       instance.application.on(createApplicationOpenEvent(true, args));
 
-      this.publishChanges({ kind: 'update'});
+      this.publishChanges({ kind: 'update' });
 
       return Ok(this.processId++);
     }
@@ -234,11 +234,15 @@ export class ApplicationManager implements BaseApplicationManager {
       case 'hyperlink': {
 
         // Hyperlink content is only editable by me, so we don't have to be very rigorous with the safety checks
-        const target      = node.target;
-        const targetPath  = constructPath(target);
+        const target = node.target;
+        const targetPath = constructPath(target);
 
         return this.openFileSystemNode(target, targetPath, args);
       };
+      case 'url': {
+        window.open(node.url, '_blank');
+        return Ok(0);
+      }
       default: return Err(Error("Not yet implemented"))
     }
   }

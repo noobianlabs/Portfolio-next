@@ -12,7 +12,7 @@ function Neofetch(shell: Shell, args: string[], apis: SystemAPIs): void {
   const height = window.innerHeight;
 
   shell.getTerminal().writeResponseLines([
-    `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⣤⣤⣤⣤⣶⣦⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀ ${greenBright("joey") + white("@") + greenBright(shell.getHostname())}`,
+    `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⣤⣤⣤⣤⣶⣦⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀ ${greenBright("abdullah") + white("@") + greenBright(shell.getHostname())}`,
     `⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⡿⠛⠉⠙⠛⠛⠛⠛⠻⢿⣿⣷⣤⡀⠀⠀⠀⠀⠀ ${white("===============")}`,
     `⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⠋⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⠈⢻⣿⣿⡄⠀⠀⠀⠀ ${entry("OS:", "j-os 1.0.0")}`,
     `⠀⠀⠀⠀⠀⠀⠀⣸⣿⡏⠀⠀⠀⣠⣶⣾⣿⣿⣿⠿⠿⠿⢿⣿⣿⣿⣄⠀⠀⠀ ${entry("Host:", "j-system 10.0")}`,

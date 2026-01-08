@@ -17,7 +17,7 @@ function createSpacer(source: string, length: number, fill: string = '\xa0') {
 function ResourceLoadingStatus(loadingProgress: LoadingProgress) {
   const progress = loadingProgress.progress();
 
-  if (progress.loaded === progress.total) { 
+  if (progress.loaded === progress.total) {
     return (<h3>Finished loading resources</h3>);
   }
 
@@ -37,8 +37,8 @@ function DisplayResource(entry: LoadingProgressEntry) {
 }
 
 function OperatingSystemStats() {
-  const name = "Joey de Ruiter";
-  const company = "Joeysoft, bv.";
+  const name = "Abdullah Saleh";
+  const company = "Abdullahsoft, bv.";
 
   const spacer = 16;
 
@@ -46,14 +46,14 @@ function OperatingSystemStats() {
     <div>
       <span className={styles['bold']}>{name}</span>
       {createSpacer(name, spacer)}
-      <span>Released: april 1998</span>
+      <span>Released: august 2023</span>
     </div>
     <div>
       <span className={styles['bold']}>{company}</span>
       {createSpacer(company, spacer)}
-      <span>Magi (C)1998 Joeysoft, bv</span>
+      <span>Magi (C)1998 Abdullahsoft, bv</span>
     </div>
-    <br/>
+    <br />
   </>)
 }
 
@@ -93,11 +93,11 @@ function ShowUserMessage(props: { onClick: () => void }) {
     <div className={styles['user-message']}>
       <div className={styles['user-message-position-container']}>
         <div className={styles['user-message-container']}>
-          <h1>Portfolio of Joey de Ruiter</h1>
-          {smallWindow && <p className={styles['warning']}>WARNING: This portfolio is best experienced on a desktop, laptop or a tablet computer</p>}  
-          <p>If you&apos;re interested, you can download my CV from <a href="/assets/cv/Joey_de_Ruiter_resume.pdf" target="_blank">here</a>.</p>
-          
-          <p>            
+          <h1>Portfolio of Abdullah Saleh</h1>
+          {smallWindow && <p className={styles['warning']}>WARNING: This portfolio is best experienced on a desktop, laptop or a tablet computer</p>}
+          <p>If you&apos;re interested, you can download my CV from <a href="/assets/cv/Abdullah_Saleh_resume.pdf" target="_blank">here</a>.</p>
+
+          <p>
             <span className={styles['continue-text']}>Click continue to begin</span>
             <span className={styles['blinking-cursor']}></span>
           </p>
@@ -120,7 +120,7 @@ function ShowBios() {
 
   return (<>
     <div>
-      <p>Magi, Joeysoft, bv - 1998-2024</p>
+      <p>Magi, Abdullahsoft, bv - 1998-2024</p>
       <h3>Components</h3>
       <ul>
         <li>{magi1}{createSpacer(magi1, length, '.')}Linked</li>
@@ -134,12 +134,12 @@ function ShowBios() {
 function DisplayWebGLError() {
   return (
     <div className={styles['loading-progress']}>
-      <OperatingSystemStats/>
+      <OperatingSystemStats />
       <div className={styles['error-container']}>
         <h3>ERROR: No WebGL detected</h3>
         <p>WebGL is required to run this site.</p>
         <p>Please enable it or switch to a browser that supports WebGL</p>
-        <p>Or if you want to download my CV, you can do so from <a href="/assets/cv/Joey_de_Ruiter_resume.pdf" target="_blank">here</a>.</p>
+        <p>Or if you want to download my CV, you can do so from <a href="/assets/cv/Abdullah_Saleh_resume.pdf" target="_blank">here</a>.</p>
       </div>
     </div>
   );
@@ -152,10 +152,10 @@ function DisplayLoadingProgress(props: { loadingProgress: LoadingProgress }) {
 
   return (<>
     <div className={styles['loading-progress']}>
-      <OperatingSystemStats/>
-      <ShowBios/>
+      <OperatingSystemStats />
+      <ShowBios />
       {loadingResources}
-      <DisplayLoadingFooter/>
+      <DisplayLoadingFooter />
     </div>
   </>)
 }
@@ -163,9 +163,9 @@ function DisplayLoadingProgress(props: { loadingProgress: LoadingProgress }) {
 function DisplayLoadingFooter() {
   return (
     <>
-      <br/>
+      <br />
       <div>
-        <p>Loading taking a while? Take a sneak peak at my <a href="/assets/cv/Joey_de_Ruiter_resume.pdf" target="_blank">resume</a>.</p>
+        <p>Loading taking a while? Take a sneak peak at my <a href="/assets/cv/Abdullah_Saleh_resume.pdf" target="_blank">resume</a>.</p>
       </div>
     </>
   );
@@ -186,13 +186,13 @@ export function SceneLoader() {
   const [showMessage, setShowMessage] = useState(true);
   const [showLoadingUnderscore, setLoadingUnderscore] = useState(true);
 
-  const scenesRef   = useRef<RendererScenes>(createRenderScenes());
-  const managerRef  = useRef<AssetManager | null>(null);
-  const actions     = useRef<UpdateAction[]>([]);
+  const scenesRef = useRef<RendererScenes>(createRenderScenes());
+  const managerRef = useRef<AssetManager | null>(null);
+  const actions = useRef<UpdateAction[]>([]);
 
   const [loadingProgress, setLoadingProgress] = useState<LoadingProgress | null>(null);
   const [supportsWebGL, setSupportsWebGL] = useState<boolean | null>(null);
-  
+
   useEffect(() => {
     const hasWebGL = detectWebGL();
     setSupportsWebGL(hasWebGL);
@@ -245,11 +245,12 @@ export function SceneLoader() {
     if (loadingProgress.isDoneLoading()) {
       if (!isDebug()) {
         setTimeout(() => { setShowProgress(false); }, 100);
-        setTimeout(() => { setLoadingUnderscore(false);
+        setTimeout(() => {
+          setLoadingUnderscore(false);
           // If a user has a mobile phone with a small screen, display the warning
           // Otherwise we just hide it
           if (!isMobileDevice()) { setShowMessage(false); }
-         }, 700);
+        }, 700);
       } else {
         setShowMessage(false);
         setShowProgress(false);
@@ -262,13 +263,13 @@ export function SceneLoader() {
   if (supportsWebGL === false) { return DisplayWebGLError(); }
 
   return (<>
-    { showProgress && loadingProgress && <DisplayLoadingProgress loadingProgress={loadingProgress}/> }
-    { showLoadingUnderscore && <LoadingUnderscore/> }
-    { showMessage && <ShowUserMessage onClick={() => setShowMessage(false)}/> }
+    {showProgress && loadingProgress && <DisplayLoadingProgress loadingProgress={loadingProgress} />}
+    {showLoadingUnderscore && <LoadingUnderscore />}
+    {showMessage && <ShowUserMessage onClick={() => setShowMessage(false)} />}
     <Renderer
       loading={loading}
       showMessage={showMessage}
-      
+
       scenes={scenesRef.current}
       actions={actions.current}
     />

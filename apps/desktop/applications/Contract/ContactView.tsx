@@ -19,7 +19,7 @@ function DutchContent() {
       Momenteel ben ik niet contract gebonden, dus als je een leuke positie hebt neem dan gerust contact met mij op! Je kan mij bereiken via mijn persoonlijke e-mail, of via het contact formulier hieronder.
     </p>
 
-    <p><b>E-mail:&nbsp;</b><a href="mailto:contact@joeyderuiter.me">contact@joeyderuiter.me</a></p>
+    <p><b>E-mail:&nbsp;</b><a href="mailto:noobianlabs@gmail.com">noobianlabs@gmail.com</a></p>
   </>);
 }
 
@@ -29,7 +29,7 @@ function EnglishContent() {
       I am currently not contracted, so if you have any opportunities feel free to reach out! You can reach me via my personal email, or fill out the form below!
     </p>
 
-    <p><b>Email:&nbsp;</b><a href="mailto:contact@joeyderuiter.me">contact@joeyderuiter.me</a></p>
+    <p><b>Email:&nbsp;</b><a href="mailto:noobianlabs@gmail.com">noobianlabs@gmail.com</a></p>
   </>);
 }
 
@@ -53,7 +53,7 @@ export default function ContactApplicationView(props: WindowProps) {
 
   function handleChange(e: any) {
     setInputFields({ ...inputFields, [e.target.name]: e.target.value });
-  } 
+  }
 
   function resetInput() {
     setInputFields({
@@ -90,7 +90,7 @@ export default function ContactApplicationView(props: WindowProps) {
     if (isEmpty(inputFields.message)) { errors.push('empty-message'); }
 
     if (!isEmail(inputFields.email)) { errors.push('invalid-email'); }
-    
+
     return errors;
   }
 
@@ -133,19 +133,19 @@ export default function ContactApplicationView(props: WindowProps) {
             <div className={styles['contact-header']}>
               <h1>Contact</h1>
               <div className={styles['contact-socials']}>
-                <a rel="noreferrer" target="_blank" href="https://github.com/0xJ0EY"><Image src="icons/github-icon.svg" alt="Github" width={22} height={22}/></a>
-                <a rel="noreferrer" target="_blank" href="https://www.linkedin.com/in/j-de-ruiter/"><Image src="icons/linkedin-icon.svg" alt="Linkedin" width={22} height={22}/></a>
-                <a rel="noreferrer" target="_blank" href="https://twitter.com/0xJ0EY"><Image src="icons/x-icon.svg" alt="X" width={22} height={22}/></a>
+                <a rel="noreferrer" target="_blank" href="https://github.com/noobianlabs"><Image src="icons/github-icon.svg" alt="Github" width={22} height={22} /></a>
+                <a rel="noreferrer" target="_blank" href="https://www.linkedin.com/in/noobian/"><Image src="icons/linkedin-icon.svg" alt="Linkedin" width={22} height={22} /></a>
+                <a rel="noreferrer" target="_blank" href="https://twitter.com/noobianlabs"><Image src="icons/x-icon.svg" alt="X" width={22} height={22} /></a>
               </div>
             </div>
-            { i18n.language === 'nl' ? DutchContent() : EnglishContent() }
+            {i18n.language === 'nl' ? DutchContent() : EnglishContent()}
             <form onSubmit={onSubmit}>
-              { processed ?
+              {processed ?
                 <div className={[styles['form-row'], styles['processed']].join(' ')}>
                   <span>{t("contact.processed")}</span>
                 </div> : <></>
               }
-              
+
               <div className={styles['form-row']}>
                 <label htmlFor="name"><span className={styles.required}>*</span>{t("contact.name")}:</label>
                 <input
@@ -174,7 +174,7 @@ export default function ContactApplicationView(props: WindowProps) {
                   value={inputFields.email}
                   onChange={handleChange}
                 />
-                { errors.has('invalid-email') ? <span>{t('contact.error.invalid-email')}</span> : <></> }
+                {errors.has('invalid-email') ? <span>{t('contact.error.invalid-email')}</span> : <></>}
               </div>
 
               <div className={styles['form-row']}>
@@ -202,12 +202,12 @@ export default function ContactApplicationView(props: WindowProps) {
                   value={inputFields.message}
                   onChange={handleChange}
                   required
-                  />
+                />
               </div>
 
               <div className={styles['form-row']}>
-                <input type="submit" className="system-button" disabled={!isFormValid() || loading} value={t("contact.send")}/>
-                
+                <input type="submit" className="system-button" disabled={!isFormValid() || loading} value={t("contact.send")} />
+
                 <div className={styles['instructions']}>
                   <span>{t("contact.message_forwarding_instructions")}</span>
                   <span className={styles['required-instructions']}><span className={styles.required}>*</span> = {t("contact.required")}</span>

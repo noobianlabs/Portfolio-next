@@ -1,8 +1,8 @@
-# Joey de Ruiter's portfolio
+# Abdullah Saleh's portfolio
 This is my personal portfolio, outlining my experience and skills.
 If you find a bug. Please report it in the issue tracker and enjoy the website! <3
 
-You can see the production version [here](https://joeyderuiter.me/)!
+You can see the production version [here](https://abdullahsaleh.com/)!
 
 ## Installing dependencies
 To install all the dependencies, run the following command:

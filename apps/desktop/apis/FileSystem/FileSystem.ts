@@ -59,8 +59,20 @@ export type FileSystemNode = (
   FileSystemTextFile |
   FileSystemApplication |
   FileSystemHyperLink |
-  FileSystemProgram
+  FileSystemProgram |
+  FileSystemURL
 );
+
+export type FileSystemURL = {
+  id: number,
+  parent: FileSystemDirectory,
+  kind: 'url',
+  filenameExtension: '',
+  icon: ApplicationIcon,
+  url: string,
+  name: string,
+  editable: boolean
+}
 
 export type DirectoryEntry = {
   node: FileSystemNode,
@@ -261,18 +273,31 @@ function createHyperLink(id: number, parent: FileSystemDirectory, target: FileSy
   }
 }
 
+function createURL(id: number, parent: FileSystemDirectory, name: string, url: string, icon: ApplicationIcon, editable: boolean): FileSystemURL {
+  return {
+    id,
+    parent,
+    kind: 'url',
+    name,
+    url,
+    icon,
+    editable,
+    filenameExtension: ''
+  };
+}
+
 export function getIconFromNode(node: FileSystemNode): ApplicationIcon {
   switch (node.kind) {
     case 'application':
-    case 'hyperlink': return node.icon;
+    case 'hyperlink':
+    case 'url': return node.icon;
     case "directory": {
       if (node.icon) { return node.icon; }
       return { src: '/icons/folder-icon.png', alt: 'Directory icon' };
     }
-    case "hyperlink": return { src: '/icons/folder-icon.png', alt: 'Hyperlink icon' };
     case "textfile": return { src: '/icons/file-icon.png', alt: 'File icon' }
     case "image": return { src: '/icons/file-icon.png', alt: 'Image icon' }
-    case "program":  return { src: '/icons/file-icon.png', alt: 'Program icon' }
+    case "program": return { src: '/icons/file-icon.png', alt: 'Program icon' }
   }
 }
 
@@ -284,7 +309,7 @@ export function createBaseFileSystem(): FileSystem {
   const root = rootEntry.value;
 
   const applicationFolderIcon = { src: '/icons/icon-applications-folder.png', alt: 'Application folder' };
-  const documentsFolderIcon =  { src: '/icons/icon-documents-folder.png', alt: 'Documents folder' };
+  const documentsFolderIcon = { src: '/icons/icon-documents-folder.png', alt: 'Documents folder' };
 
   // Create base file tree
   const applications = fileSystem.addDirectory(root, 'Applications', false, false, applicationFolderIcon);
@@ -304,14 +329,17 @@ export function createBaseFileSystem(): FileSystem {
 
   // Create macOS like Users folder
   const users = fileSystem.addDirectory(root, 'Users', false, false);
-  const joey = fileSystem.addDirectory(users, 'joey', false, true);
+  const abdullah = fileSystem.addDirectory(users, 'abdullah', false, true);
 
-  const desktop = fileSystem.addDirectory(joey, 'Desktop', false, true);
-  const documents = fileSystem.addDirectory(joey, 'Documents', false, true, documentsFolderIcon);
+  const desktop = fileSystem.addDirectory(abdullah, 'Desktop', false, true);
+  const documents = fileSystem.addDirectory(abdullah, 'Documents', false, true, documentsFolderIcon);
   const trashCanIcon = { src: '/icons/trash-icon.png', alt: 'Trash can icon' };
-  const trash = fileSystem.addDirectory(joey, 'Trash', false, true, trashCanIcon);
+  const trash = fileSystem.addDirectory(abdullah, 'Trash', false, true, trashCanIcon);
 
   fileSystem.addHyperLink(desktop, applications, 'Applications', applicationFolderIcon, true);
+
+  const resumeIcon = { src: '/icons/file-icon.png', alt: 'Resume' };
+  fileSystem.addURL(desktop, 'Resume.pdf', '/cv/Abdullah_Saleh_resume.pdf', resumeIcon, false);
 
   if (doom.ok) {
     const doomShortcutIcon = { src: '/icons/doom-icon.png', alt: 'Play Doom' };
@@ -323,9 +351,15 @@ export function createBaseFileSystem(): FileSystem {
     fileSystem.addHyperLink(desktop, algoViz.value, 'Algorithms', algoVizShortcutIcon, true);
   }
 
+  const henryIcon = { src: '/icons/icon-profile.png', alt: "Henry Heffernan's Portfolio" };
+  fileSystem.addURL(desktop, 'Henry Heffernan', 'https://henryheffernan.com/', henryIcon, false);
+
+  const joeyIcon = { src: '/icons/icon-profile.png', alt: "Joey de Ruiter's GitHub" };
+  fileSystem.addURL(desktop, 'Joey de Ruiter', 'https://github.com/joeyderuiter/Portfolio-next', joeyIcon, false);
+
   const readmeText = `Hey, welcome to my portfolio website!
 
-This website is meant as an interactive showcase of my work as software developer for the last few years.
+This website is meant as an interactive showcase of my work as a Software Engineer for the last few years.
 
 Please enjoy, and explore as much as you would like.
 `;
@@ -405,9 +439,9 @@ function entriesWithinSelection(entries: Point[], x: number, y: number, dimensio
 
 function generatePosition(iteration: number, settings: DirectorySettings, content: DirectoryContent, boundingBox: BoundingBox): { x: number, y: number } {
   const direction = settings.sortDirection;
-  const origin    = settings.sortOrigin;
-  const gridWidth   = Math.floor(content.width / boundingBox.width);
-  const gridHeight  = Math.floor(content.height / boundingBox.height);
+  const origin = settings.sortOrigin;
+  const gridWidth = Math.floor(content.width / boundingBox.width);
+  const gridHeight = Math.floor(content.height / boundingBox.height);
 
   function positionX(iteration: number, direction: 'horizontal' | 'vertical'): number {
     switch (direction) {
@@ -437,7 +471,7 @@ function generatePosition(iteration: number, settings: DirectorySettings, conten
   return { x, y };
 }
 
-function generatePositionRange(settings: DirectorySettings, content: DirectoryContent, boundingBox: { width: number, height: number}): { x: number, y: number }[] {
+function generatePositionRange(settings: DirectorySettings, content: DirectoryContent, boundingBox: { width: number, height: number }): { x: number, y: number }[] {
   const horizontalSteps = Math.floor(content.width / boundingBox.width);
   const verticalSteps = Math.floor(content.height / boundingBox.height);
 
@@ -489,7 +523,7 @@ export function calculateNodePosition(
           round++;
         }
 
-      } while(entriesWithinSelection(others, position.x, position.y, nodeBoundingBox) > round);
+      } while (entriesWithinSelection(others, position.x, position.y, nodeBoundingBox) > round);
 
       return position;
     }
@@ -631,7 +665,7 @@ export class FileSystem {
         const newLookupPath = constructPath(node);
         this.lookupTable[newLookupPath] = node;
 
-        this.propagateNodeEvent(node, {kind: 'rename', path: newLookupPath});
+        this.propagateNodeEvent(node, { kind: 'rename', path: newLookupPath });
       });
   }
 
@@ -860,6 +894,18 @@ export class FileSystem {
     this.propagateNodeEvent(parent, { kind: 'update' });
 
     return hyperlink;
+  }
+
+  public addURL(parent: FileSystemDirectory, name: string, url: string, icon: ApplicationIcon, editable: boolean) {
+    const urlNode = createURL(++this.id, parent, name, url, icon, editable);
+
+    this.addNodeToDirectory(parent, urlNode);
+
+    this.lookupTable[constructPath(urlNode)] = urlNode;
+
+    this.propagateNodeEvent(parent, { kind: 'update' });
+
+    return urlNode;
   }
 
   public addNodeToDirectory(directory: FileSystemDirectory, node: FileSystemNode): DirectoryEntry {

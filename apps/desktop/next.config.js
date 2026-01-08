@@ -18,6 +18,15 @@ const nextConfig = {
         ]
       }
     ]
+  },
+  async redirects() {
+    return [
+      {
+        source: '/cv/Joey_de_Ruiter_resume.pdf',
+        destination: '/cv/Abdullah_Saleh_resume.pdf',
+        permanent: true,
+      },
+    ]
   }
 }
 

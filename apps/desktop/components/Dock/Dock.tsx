@@ -33,9 +33,10 @@ const ActiveIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAA
 type ApplicationDockItem = { kind: 'application', config: ApplicationConfig, active: boolean, onClick: () => void }
 type MinimizedApplicationDockItem = { kind: 'minimized_application', title: string, config: ApplicationConfig, onClick: () => void }
 type SeparatorDockItem = { kind: 'separator' }
-type DirectoryDockItem = { kind: 'directory', title: string, path: string, icon: ApplicationIcon, onClick: () => void}
+type DirectoryDockItem = { kind: 'directory', title: string, path: string, icon: ApplicationIcon, onClick: () => void }
+type FileDockItem = { kind: 'file', title: string, path: string, icon: ApplicationIcon, onClick: () => void }
 
-type DockItem = ApplicationDockItem | MinimizedApplicationDockItem | SeparatorDockItem | DirectoryDockItem;
+type DockItem = ApplicationDockItem | MinimizedApplicationDockItem | SeparatorDockItem | DirectoryDockItem | FileDockItem;
 
 function DockItemViewApplication(item: ApplicationDockItem) {
   return (<>
@@ -75,7 +76,7 @@ function DockItemSeparator() {
   return (<div className={styles.separator}></div>)
 }
 
-function DockItemDirectory(item: DirectoryDockItem, fileSystem: FileSystem) {
+function DockItemDirectory(item: DirectoryDockItem | FileDockItem, fileSystem: FileSystem) {
   const ref = useRef<HTMLButtonElement>(null);
   const [hovered, setHovered] = useState<boolean>(false);
 
@@ -140,6 +141,7 @@ function DockItemView(item: DockItem) {
     case 'application': return DockItemViewApplication(item)
     case 'minimized_application': return DockItemMinimizedApplication(item);
     case 'separator': return DockItemSeparator();
+    case 'file': return DockItemDirectory(item as any, {} as any); // DockItemDirectory just renders an icon and handles click
   }
 }
 
@@ -149,15 +151,15 @@ export function Dock(props: { apis: SystemAPIs, manager: ApplicationManager, win
   const fileSystem = apis.fileSystem;
 
   const [dockItems, setDockItems] = useState<DockItem[]>(constructDock(manager, windowCompositor, systemService.isDebug()));
-  const [directoryItems] = useState<DirectoryDockItem[]>(constructDirectoryItems());
+  const [directoryItems] = useState<(DirectoryDockItem | FileDockItem)[]>(constructDirectoryItems());
 
   function constructDock(manager: ApplicationManager, windowCompositor: WindowCompositor, debug: boolean): DockItem[] {
     let content: DockItem[] = [];
 
-    const dockApplications    = !debug ? DockApplications : DebugDockApplications;
+    const dockApplications = !debug ? DockApplications : DebugDockApplications;
 
-    const activeApplications  = manager.listApplications().map(x => x.config());
-    const minimizedWindows    = windowCompositor.listMinimizedWindows();
+    const activeApplications = manager.listApplications().map(x => x.config());
+    const minimizedWindows = windowCompositor.listMinimizedWindows();
 
     {
       const items: Record<string, { config: ApplicationConfig, active: boolean }> = {};
@@ -173,7 +175,7 @@ export function Dock(props: { apis: SystemAPIs, manager: ApplicationManager, win
       });
 
       Object.values(items)
-        .sort((a, b) => { 
+        .sort((a, b) => {
           // Bubble sorting time 😎
           const aPriority = a.config.dockPriority ?? 0;
           const bPriority = b.config.dockPriority ?? 0;
@@ -201,20 +203,20 @@ export function Dock(props: { apis: SystemAPIs, manager: ApplicationManager, win
       minimizedWindows
         .slice(0, Math.min(minimizedWindows.length, 5))
         .forEach(window => {
-        content.push({
-          kind: 'minimized_application',
-          title: window.title,
-          config: window.application.config(),
-          onClick: () => onClickMinimizedApplicationWindow(window)
+          content.push({
+            kind: 'minimized_application',
+            title: window.title,
+            config: window.application.config(),
+            onClick: () => onClickMinimizedApplicationWindow(window)
+          });
         });
-      });
     }
 
     return content;
   }
 
-  function constructDirectoryItems(): DirectoryDockItem[] {
-    let content: DirectoryDockItem[] = [];
+  function constructDirectoryItems(): (DirectoryDockItem | FileDockItem)[] {
+    let content: (DirectoryDockItem | FileDockItem)[] = [];
 
     function onClickDirectory(path: string) {
       manager.open(`/Applications/Finder.app ${path}`);
@@ -224,26 +226,34 @@ export function Dock(props: { apis: SystemAPIs, manager: ApplicationManager, win
       kind: 'directory',
       title: 'Applications',
       path: '/Applications',
-      icon:  { src: '/icons/icon-applications-folder.png', alt: 'File icon' },
+      icon: { src: '/icons/icon-applications-folder.png', alt: 'File icon' },
       onClick: () => onClickDirectory('/Applications'),
     });
-    
+
     content.push({
       kind: 'directory',
       title: 'Documents',
-      path: '/Users/joey/Documents',
-      icon:  { src: '/icons/icon-documents-folder.png', alt: 'File icon' },
-      onClick: () => onClickDirectory('/Users/joey/Documents'),
+      path: '/Users/abdullah/Documents',
+      icon: { src: '/icons/icon-documents-folder.png', alt: 'File icon' },
+      onClick: () => onClickDirectory('/Users/abdullah/Documents'),
     });
 
     content.push({
       kind: 'directory',
       title: 'Bin',
-      path: '/Users/joey/Trash',
-      icon:  { src: '/icons/trash-icon.png', alt: 'Trash can' },
-      onClick: () => onClickDirectory('/Users/joey/Trash'),
+      path: '/Users/abdullah/Trash',
+      icon: { src: '/icons/trash-icon.png', alt: 'Trash can' },
+      onClick: () => onClickDirectory('/Users/abdullah/Trash'),
     });
-  
+
+    content.push({
+      kind: 'file',
+      title: 'Resume',
+      path: '/Users/abdullah/Desktop/Resume.pdf',
+      icon: { src: '/icons/printer.png', alt: 'Resume' },
+      onClick: () => manager.open('/Users/abdullah/Desktop/Resume.pdf'),
+    });
+
     return content;
   }
 
@@ -270,8 +280,10 @@ export function Dock(props: { apis: SystemAPIs, manager: ApplicationManager, win
   return <>
     <div className={styles.dock}>
       <div data-drop-point="true" className={styles.dockContainer}>
-        { dockItems.map((item, i) => <React.Fragment key={i}>{DockItemView(item)}</React.Fragment>) }
-        { directoryItems.map((item, i) => <React.Fragment key={i}>{DockItemDirectory(item, fileSystem)}</React.Fragment>) }
+        {dockItems.map((item, i) => <React.Fragment key={i}>
+          {item.kind === 'file' ? DockItemDirectory(item as any, fileSystem) : DockItemView(item)}
+        </React.Fragment>)}
+        {directoryItems.map((item, i) => <React.Fragment key={i}>{DockItemDirectory(item, fileSystem)}</React.Fragment>)}
       </div>
     </div>
   </>
