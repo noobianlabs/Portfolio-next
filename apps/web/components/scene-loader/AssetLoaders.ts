@@ -57,7 +57,12 @@ function transformWebUrlToDesktop(webUrl: string): string {
 }
 
 function getDesktopTargetUrl(): string {
-  const env = process.env.NEXT_PUBLIC_VERCEL_ENV ?? 'local';
+  // Try the explicit target URL first (best for Railway/Production)
+  if (process.env.NEXT_PUBLIC_TARGET_URL) {
+    return process.env.NEXT_PUBLIC_TARGET_URL;
+  }
+
+  const env = process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.RAILWAY_ENVIRONMENT_NAME ?? 'local';
 
   if (env === 'production') {
     return 'https://portfolio-next-desktop.vercel.app/';
@@ -65,12 +70,9 @@ function getDesktopTargetUrl(): string {
 
   if (env === 'preview' || env === 'development') {
     const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?? window.location.host;
-
     return transformWebUrlToDesktop(vercelUrl);
   } else {
-    const target = process.env.NEXT_PUBLIC_TARGET_URL ?? 'http://127.0.0.1:3001/'
-
-    return target;
+    return 'http://127.0.0.1:3001/';
   }
 }
 
@@ -112,7 +114,7 @@ export function FloorLoader(): AssetLoader {
 
   async function downloader(context: AssetManagerContext): Promise<void> {
     const textureLoader = async () => { texture = await loadTexture(context, '/assets/SmoothFloor.jpg'); }
-    const assetLoader   = async () => { asset = await loadModel(context, '/assets/SmoothFloor.glb'); }
+    const assetLoader = async () => { asset = await loadModel(context, '/assets/SmoothFloor.glb'); }
 
     await Promise.all([textureLoader(), assetLoader()]);
   }
@@ -148,7 +150,7 @@ export function DeskLoader(): AssetLoader {
 
   async function downloader(context: AssetManagerContext): Promise<void> {
     const textureLoader = async () => { texture = await loadTexture(context, '/assets/Desk.jpg'); }
-    const assetLoader   = async () => { asset = await loadModel(context, '/assets/Desk.glb'); }
+    const assetLoader = async () => { asset = await loadModel(context, '/assets/Desk.glb'); }
 
     await Promise.all([textureLoader(), assetLoader()]);
   }
@@ -190,10 +192,10 @@ export function MonitorLoader(): AssetLoader {
   let asset: GLTF | null;
 
   async function downloader(context: AssetManagerContext): Promise<void> {
-    const monitorLoader   = async () => { monitorTexture = await loadTexture(context, '/assets/Monitor.jpg'); }
-    const computerLoader  = async () => { computerTexture = await loadTexture(context, '/assets/Computer.jpg'); }
+    const monitorLoader = async () => { monitorTexture = await loadTexture(context, '/assets/Monitor.jpg'); }
+    const computerLoader = async () => { computerTexture = await loadTexture(context, '/assets/Computer.jpg'); }
     const namePlateLoader = async () => { namePlateTexture = await loadTexture(context, '/assets/NamePlate.jpg'); }
-    const assetLoader     = async () => { asset = await loadModel(context, '/assets/Monitor.glb'); }
+    const assetLoader = async () => { asset = await loadModel(context, '/assets/Monitor.glb'); }
 
     await Promise.all([monitorLoader(), computerLoader(), namePlateLoader(), assetLoader()]);
   }
@@ -208,8 +210,8 @@ export function MonitorLoader(): AssetLoader {
     displayMaterial.stencilWrite = true;
     displayMaterial.transparent = true;
 
-    const monitorMaterial   = new MeshBasicMaterial({ map: monitorTexture });
-    const computerMaterial  = new MeshBasicMaterial({ map: computerTexture });
+    const monitorMaterial = new MeshBasicMaterial({ map: monitorTexture });
+    const computerMaterial = new MeshBasicMaterial({ map: computerTexture });
     const nameplateMaterial = new MeshBasicMaterial({ map: namePlateTexture });
 
     asset.scene.traverse((node) => {
@@ -243,14 +245,14 @@ export function MonitorLoader(): AssetLoader {
     // Use a slightly higher margin on Safari, as 0.1 gives white lines and 0.2 is too big for other browser to look nice.
     const margin = isSafari() ? 0.2 : 0.1;
 
-    const width   = (box.max.x - box.min.x) + margin;
-    const height  = width * (pageHeight / pageWidth);
-    const depth   = (box.max.z - box.min.z);
+    const width = (box.max.x - box.min.x) + margin;
+    const height = width * (pageHeight / pageWidth);
+    const depth = (box.max.z - box.min.z);
 
     const planeHeight = Math.sqrt(Math.pow(depth, 2) + Math.pow(height, 2));
 
     const viewHeightScale = planeHeight / pageHeight;
-    const viewWidthScale  = width / pageWidth;
+    const viewWidthScale = width / pageWidth;
 
     // TODO: Calculate the correct aspect ratio for the content
     const container = document.createElement('div');
@@ -309,7 +311,7 @@ export function KeyboardLoader(): AssetLoader {
   let asset: GLTF | null;
 
   async function downloader(context: AssetManagerContext): Promise<void> {
-    const caseTextureLoader   = async () => { caseTexture = await loadTexture(context, '/assets/KeyboardCase.jpg'); }
+    const caseTextureLoader = async () => { caseTexture = await loadTexture(context, '/assets/KeyboardCase.jpg'); }
     const keyCapTextureLoader = async () => { keyCapTexture = await loadTexture(context, '/assets/KeyboardKeyCaps.jpg'); }
 
     const assetLoader = async () => { asset = await loadModel(context, '/assets/Keyboard.glb'); }
@@ -327,8 +329,8 @@ export function KeyboardLoader(): AssetLoader {
 
     enableCameraCollision(asset);
 
-    const caseMaterial    = new MeshBasicMaterial({ map: caseTexture });
-    const keyCapMaterial  = new MeshBasicMaterial({ map: keyCapTexture });
+    const caseMaterial = new MeshBasicMaterial({ map: caseTexture });
+    const keyCapMaterial = new MeshBasicMaterial({ map: keyCapTexture });
 
     asset.scene.traverse((node) => {
       if (!(node instanceof Mesh)) { return; }
