@@ -18,6 +18,7 @@ import { IconHeight, IconWidth } from "@/components/Icons/FolderIcon";
 import { skillsConfig } from "@/applications/Skills/Skills";
 import { algorithmVisualizerConfig } from "@/applications/AlgorithmVisualizer/AlgorithmVisualizer";
 import { terminalConfig } from "@/applications/Terminal/TerminalApplication";
+import { browserConfig } from "@/applications/Browser/Browser";
 import { ProgramConfig } from "@/programs/Programs";
 import { lsConfig } from "@/programs/ListFiles/ListFiles";
 import { pwdConfig } from "@/programs/PrintWorkingDirectory/PrintWorkingDirectory";
@@ -319,6 +320,7 @@ export function createBaseFileSystem(): FileSystem {
   fileSystem.addApplication(aboutConfig);
   fileSystem.addApplication(notesConfig);
   fileSystem.addApplication(terminalConfig);
+  fileSystem.addApplication(browserConfig);
   const algoViz = fileSystem.addApplication(algorithmVisualizerConfig);
   const doom = fileSystem.addApplication(doomConfig);
   fileSystem.addApplication(imageViewerConfig);
@@ -344,6 +346,18 @@ export function createBaseFileSystem(): FileSystem {
   if (doom.ok) {
     const doomShortcutIcon = { src: '/icons/doom-icon.png', alt: 'Play Doom' };
     fileSystem.addHyperLink(desktop, doom.value, 'Doom', doomShortcutIcon, true);
+  }
+
+  const browserIcon = { src: '/icons/world-icon.png', alt: 'Browser' };
+  const browserApp = fileSystem.getApplication('/Applications/Browser.app');
+  if (browserApp.ok) {
+    fileSystem.addHyperLink(desktop, browserApp.value, 'Browser', browserIcon, true);
+  }
+
+  const aboutApp = fileSystem.getApplication('/Applications/About.app');
+  if (aboutApp.ok) {
+    const thankYouIcon = { src: '/icons/project-thank-you.png', alt: 'Thank You' };
+    fileSystem.addHyperLink(desktop, aboutApp.value, 'Thank You', thankYouIcon, true);
   }
 
   if (algoViz.ok) {

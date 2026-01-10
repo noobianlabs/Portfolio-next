@@ -33,3 +33,11 @@ npm run dev
 ```
 The `web` app starts on http://localhost:3000/
 The `desktop` app starts on http://localhost:3001/
+36: 
+37: ## Credits & Appreciation
+38: 
+39: This portfolio is built upon the incredible work of:
+40: - **[Joey de Ruiter](https://github.com/joeyderuiter/Portfolio-next)**: For the original Unix-inspired framework and virtual file system.
+41: - **[Henry Heffernan](https://henryheffernan.com/)**: For the visual inspiration and pioneering interactive desktop portfolios.
+42: 
+43: Special thanks to everyone who has contributed to the open-source projects that made this possible.
