@@ -1,3 +1,4 @@
+const path = require('path');
 const { config } = require('process')
 
 /** @type {import('next').NextConfig} */
@@ -6,6 +7,7 @@ const nextConfig = {
   transpilePackages: ['rpc'],
   devIndicators: false,
   turbopack: {
+    root: path.resolve(__dirname, '../../'),
     rules: {
       "*.frag": {
         loaders: ['raw-loader'],

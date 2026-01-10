@@ -1,3 +1,4 @@
+const path = require('path');
 const { i18n } = require('./next-i18next.config');
 
 /** @type {import('next').NextConfig} */
@@ -6,6 +7,9 @@ const nextConfig = {
   devIndicators: false,
   reactStrictMode: true,
   transpilePackages: ['rpc'],
+  turbopack: {
+    root: path.resolve(__dirname, '../../'),
+  },
   async headers() {
     return [
       {
