@@ -57,23 +57,35 @@ function transformWebUrlToDesktop(webUrl: string): string {
 }
 
 function getDesktopTargetUrl(): string {
-  // Try the explicit target URL first (best for Railway/Production)
+  const host = typeof window !== 'undefined' ? window.location.hostname : '';
+  const isProductionHost = host.includes('railway.app') || host.includes('vercel.app');
+
+  // 1. Explicit target URL from environment (best for production)
   if (process.env.NEXT_PUBLIC_TARGET_URL) {
+    console.log('[Portfolio] Using NEXT_PUBLIC_TARGET_URL:', process.env.NEXT_PUBLIC_TARGET_URL);
     return process.env.NEXT_PUBLIC_TARGET_URL;
   }
 
-  const env = process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.RAILWAY_ENVIRONMENT_NAME ?? 'local';
+  // 2. Vercel automatically sets these
+  const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV;
 
-  if (env === 'production') {
+  if (vercelEnv === 'production') {
     return 'https://portfolio-next-desktop.vercel.app/';
   }
 
-  if (env === 'preview' || env === 'development') {
-    const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?? window.location.host;
+  if (vercelEnv === 'preview' || vercelEnv === 'development') {
+    const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?? (typeof window !== 'undefined' ? window.location.host : '');
     return transformWebUrlToDesktop(vercelUrl);
-  } else {
-    return 'http://127.0.0.1:3001/';
   }
+
+  // 3. Railway or other production fallback
+  if (isProductionHost) {
+    console.warn('[Portfolio] Production host detected but NEXT_PUBLIC_TARGET_URL is missing.');
+    // We don't have a reliable way to guess the other service's hash on Railway, 
+    // so we return the local one as a fallback but the warning will show in console.
+  }
+
+  return 'http://127.0.0.1:3001/';
 }
 
 function getDesktopTarget(debug: boolean): string {
