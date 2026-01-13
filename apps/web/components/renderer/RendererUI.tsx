@@ -24,10 +24,10 @@ function useSoundManagement(soundService: SoundService) {
 
   function disableSound() {
     setSoundEnabled(false);
-    soundService.disable(); 
+    soundService.disable();
   }
 
-  return {isSoundEnabled, toggleSound, enableSound, disableSound};
+  return { isSoundEnabled, toggleSound, enableSound, disableSound };
 }
 
 export type RendererUIProps = {
@@ -59,7 +59,7 @@ function SoundManagementButton(props: { sound: SubViewSound }) {
 
   return (
     <button className={styles['mute-button']} onClick={() => toggleSound()}>
-      <img draggable={false} src={icon} width={25} height={20}/>
+      <img draggable={false} src={icon} width={25} height={20} />
     </button>
   )
 }
@@ -76,7 +76,7 @@ function ChangeSceneButton(props: { targetState: CameraHandlerState, cameraHandl
 
   return (
     <button className={styles['camera-button']} onClick={() => changeScene()}>
-      <img draggable={false} src={icon} width={25} height={20}/>
+      <img draggable={false} src={icon} width={25} height={20} />
     </button>
   );
 }
@@ -98,7 +98,7 @@ function NameAndTime(props: {
   const isActive = state === CameraHandlerState.FreeRoam;
 
   function formatTime(dateTime: Date): string {
-    const hours   = String(dateTime.getHours()).padStart(2, '0');
+    const hours = String(dateTime.getHours()).padStart(2, '0');
     const minutes = String(dateTime.getMinutes()).padStart(2, '0');
     const seconds = String(dateTime.getSeconds()).padStart(2, '0');
 
@@ -110,8 +110,8 @@ function NameAndTime(props: {
       setTimeout(() => writeOutCharsStreaming(stream, setter, MStoWriteChar), charDelay * MStoWriteChar);
     }
 
-    const name = "Joey de Ruiter";
-    const title = "Software engineer";
+    const name = "Abdullah Saleh";
+    const title = "people > profit";
 
     // Write all the content
     writeAfterDelay(() => name, setName, 0);
@@ -150,8 +150,8 @@ function NameAndTime(props: {
       <div>{title && <span>{title}</span>}</div>
       <div>
         {time && <span className={`${done ? styles['time-is-done'] : ''}`}>{time}</span>}
-        {done && <SoundManagementButton sound={sound}/>}
-        {done && <ChangeSceneButton targetState={CameraHandlerState.MonitorView} cameraHandler={cameraHandler}/>}
+        {done && <SoundManagementButton sound={sound} />}
+        {done && <ChangeSceneButton targetState={CameraHandlerState.MonitorView} cameraHandler={cameraHandler} />}
       </div>
     </div>
   );
@@ -166,16 +166,16 @@ function UserInteractionButtons(props: {
 
   const isActive = (
     state === CameraHandlerState.Cinematic ||
-    state === CameraHandlerState.MonitorView 
+    state === CameraHandlerState.MonitorView
   );
 
   return (<>
     <div className={joinStyles([
-        styles['sound-container'],
-        !isActive ? styles['fade-out'] : null
-      ])}>
-        <SoundManagementButton sound={sound}/>
-        <ChangeSceneButton targetState={state === CameraHandlerState.Cinematic ? CameraHandlerState.MonitorView : CameraHandlerState.Cinematic} cameraHandler={cameraHandler}/>
+      styles['sound-container'],
+      !isActive ? styles['fade-out'] : null
+    ])}>
+      <SoundManagementButton sound={sound} />
+      <ChangeSceneButton targetState={state === CameraHandlerState.Cinematic ? CameraHandlerState.MonitorView : CameraHandlerState.Cinematic} cameraHandler={cameraHandler} />
     </div>
   </>);
 }

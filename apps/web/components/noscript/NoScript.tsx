@@ -43,12 +43,12 @@ export function NoScriptWarning() {
     <noscript>
       <style>{css}</style>
 
-      <span className="bold">Joey de Ruiter</span>
+      <span className="bold">Abdullah Saleh</span>
 
       <h3>ERROR: No JS detected</h3>
 
       <p>Javascript is required for this website to work.</p>
-      <p>If you&apos;re interested in my resume, you can download my CV from <a href="/assets/cv/Joey_de_Ruiter_resume.pdf" target="_blank">here</a>.</p>
+      <p>If you&apos;re interested in my resume, you can download my CV from <a href="/assets/cv/Abdullah_Saleh_resume.pdf" target="_blank">here</a>.</p>
     </noscript>
   );
 }
