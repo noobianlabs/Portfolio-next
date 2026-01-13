@@ -31,7 +31,7 @@ function buildPathNodesFromDirectoryEntry(node: FileSystemNode): FileSystemDirec
 
     current = current.parent;
   }
-  
+
   // Reverse the entries
   for (let i = 0; i < Math.floor(items.length / 2); i++) {
     const target = (items.length - 1) - i;
@@ -46,9 +46,9 @@ function buildPathNodesFromDirectoryEntry(node: FileSystemNode): FileSystemDirec
 
 export default function FinderView(props: WindowProps) {
   const { application, args, windowContext } = props;
-  const [ path, setPath ] = useState(args);
-  const [ canEdit, setCanEdit ] = useState(false);
-  const [ pathNodes, setPathNodes ] = useState<FileSystemDirectory[]>([]);
+  const [path, setPath] = useState(args);
+  const [canEdit, setCanEdit] = useState(false);
+  const [pathNodes, setPathNodes] = useState<FileSystemDirectory[]>([]);
   const [needsMobileView, setNeedsMobileView] = useState(false);
 
   const apis = props.application.apis;
@@ -63,7 +63,7 @@ export default function FinderView(props: WindowProps) {
     if (currentHistoryElement.current) {
       history.current.cutOff(currentHistoryElement.current);
     }
-    
+
     currentHistoryElement.current = history.current.append(directory);
   }
 
@@ -80,7 +80,7 @@ export default function FinderView(props: WindowProps) {
 
   function hasForwardHistory(): boolean {
     if (!currentHistoryElement.current) { return false; }
-    
+
     return currentHistoryElement.current.next !== null;
   }
 
@@ -90,7 +90,7 @@ export default function FinderView(props: WindowProps) {
     const prev = currentHistoryElement.current!.prev;
 
     currentHistoryElement.current = prev;
-    
+
     changeDirectory(prev!.value);
   }
 
@@ -100,7 +100,7 @@ export default function FinderView(props: WindowProps) {
     const next = currentHistoryElement.current!.next;
 
     currentHistoryElement.current = next;
-    
+
     changeDirectory(next!.value);
   }
 
@@ -113,7 +113,7 @@ export default function FinderView(props: WindowProps) {
     const template = t('filesystem.new_directory');
     const name = generateUniqueNameForDirectory(dir.value, template);
 
-    const noop = () => {};
+    const noop = () => { };
 
     application.compositor.prompt(windowContext.id, t('finder.create_directory_instructions'), name)
       .then((name) => {
@@ -121,9 +121,9 @@ export default function FinderView(props: WindowProps) {
           application.compositor.alert(windowContext.id, t('finder.create_directory_duplicated_name')).catch(noop);
           return;
         }
-        
+
         fs.addDirectory(dir.value, name, true, true);
-        fs.propagateNodeEvent(dir.value, {kind: 'update'});
+        fs.propagateNodeEvent(dir.value, { kind: 'update' });
       }).catch(noop);
   }
 
@@ -136,7 +136,7 @@ export default function FinderView(props: WindowProps) {
     const template = t('filesystem.new_file');
     const name = generateUniqueNameForDirectory(dir.value, template);
 
-    const noop = () => {};
+    const noop = () => { };
 
     application.compositor.prompt(windowContext.id, t('finder.create_text_file_instructions'), name)
       .then((name) => {
@@ -144,9 +144,9 @@ export default function FinderView(props: WindowProps) {
           application.compositor.alert(windowContext.id, t('finder.create_text_file_duplicated_name')).catch(noop);
           return;
         }
-        
+
         fs.addTextFile(dir.value, name, "", true);
-        fs.propagateNodeEvent(dir.value, {kind: 'update'});
+        fs.propagateNodeEvent(dir.value, { kind: 'update' });
       }).catch(noop);
   }
 
@@ -176,7 +176,7 @@ export default function FinderView(props: WindowProps) {
       if (!rename) { recordHistory(file); }
     } else {
       const path = constructPath(file);
-      application.on({ kind: 'finder-open-file-event', path}, windowContext)
+      application.on({ kind: 'finder-open-file-event', path }, windowContext)
     }
   }
 
@@ -202,7 +202,7 @@ export default function FinderView(props: WindowProps) {
     }
 
   }, []);
-  
+
   function onClickBreadcrumb(directory: FileSystemDirectory, index: number) {
     if (index === pathNodes.length - 1) { return; }
 
@@ -219,9 +219,9 @@ export default function FinderView(props: WindowProps) {
   }
 
   const mobileClass = needsMobileView ? styles['mobile'] : '';
-  
+
   const locations = pathNodes.map((val, index) => <React.Fragment key={index}><button className={['system-button', styles.breadcrumb].join(' ')} onClick={() => onClickBreadcrumb(val, index)}>{val.name}</button></React.Fragment>);
- 
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -236,14 +236,14 @@ export default function FinderView(props: WindowProps) {
           {t("finder.favorites")}
           <ul>
             <li><button className={`system-button ${styles['navigation-btn']} ${mobileClass}`} onClick={() => { onClickLocation('/Applications/'); }}>Applications</button></li>
-            <li><button className={`system-button ${styles['navigation-btn']} ${mobileClass}`} onClick={() => { onClickLocation('/Users/joey/'); }}>Home</button></li>
-            <li><button className={`system-button ${styles['navigation-btn']} ${mobileClass}`} onClick={() => { onClickLocation('/Users/joey/Desktop/'); }}>Desktop</button></li>
-            <li><button className={`system-button ${styles['navigation-btn']} ${mobileClass}`} onClick={() => { onClickLocation('/Users/joey/Documents'); }}>Documents</button></li>
+            <li><button className={`system-button ${styles['navigation-btn']} ${mobileClass}`} onClick={() => { onClickLocation('/Users/abdullah/'); }}>Home</button></li>
+            <li><button className={`system-button ${styles['navigation-btn']} ${mobileClass}`} onClick={() => { onClickLocation('/Users/abdullah/Desktop/'); }}>Desktop</button></li>
+            <li><button className={`system-button ${styles['navigation-btn']} ${mobileClass}`} onClick={() => { onClickLocation('/Users/abdullah/Documents'); }}>Documents</button></li>
           </ul>
         </div>
         <div className={styles.folder}>
           <div className={styles.path}>
-            { locations }
+            {locations}
           </div>
           <FolderView directory={path} apis={application.apis} onFileOpen={onFileOpen} allowOverflow={true}></FolderView>
         </div>

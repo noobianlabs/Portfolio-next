@@ -34,7 +34,7 @@ export class Finder extends Application {
       displayOptions: { boldText: true },
       name: 'Finder',
       items: [
-        { kind: 'action', value: 'Open window', action: () => this.openNewWindow('/Users/joey/') },
+        { kind: 'action', value: 'Open window', action: () => this.openNewWindow('/Users/abdullah/') },
       ]
     }]
   }
@@ -51,8 +51,8 @@ export class Finder extends Application {
       generator: () => { return View; }
     });
 
-    window.minimalHeight  = 250;
-    window.minimalWidth   = 400;
+    window.minimalHeight = 250;
+    window.minimalWidth = 400;
   }
 
   on(event: ApplicationEvent, windowContext?: WindowContext): void {
@@ -61,7 +61,7 @@ export class Finder extends Application {
       // Do not open a Finder window on the first start, due to the Operating system starting Finder at "boot"
       if (event.isFirst) { return; }
 
-      const path = event.args.length !== 0 ? event.args : '/Users/joey/';
+      const path = event.args.length !== 0 ? event.args : '/Users/abdullah/';
       this.openNewWindow(path);
     };
 

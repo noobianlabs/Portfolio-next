@@ -16,11 +16,11 @@ interface ApplicationData {
   application: WindowApplication
 }
 
-const applicationReducer = (windowCompositor: WindowCompositor) => {  
+const applicationReducer = (windowCompositor: WindowCompositor) => {
   return (state: ApplicationData[], action: WindowEvent) => {
-    
+
     switch (action.event) {
-      case 'create_window': { 
+      case 'create_window': {
         const window = windowCompositor.getById(action.windowId);
         if (!window) { return state; }
 
@@ -28,10 +28,10 @@ const applicationReducer = (windowCompositor: WindowCompositor) => {
 
         const application = window.generator();
         const entry = { window, application };
-        
+
         state = [...state, entry];
       }
-      break;
+        break;
 
       case 'update_window': {
         const window = windowCompositor.getById(action.windowId);
@@ -45,24 +45,24 @@ const applicationReducer = (windowCompositor: WindowCompositor) => {
           return x;
         });
       }
-      break;
+        break;
 
       case 'update_windows': {
         state = state.map(x => {
           const window = windowCompositor.getById(x.window.id);
-          if (window === null) {  throw new Error('Attempting to update a window that doesn\'t exist') }
+          if (window === null) { throw new Error('Attempting to update a window that doesn\'t exist') }
 
           x.window = window;
           return x;
         });
       }
-      break;
+        break;
 
       case 'destroy_window':
         state = state.filter(x => x.window.id !== action.windowId);
-      break;
+        break;
     }
-    
+
     return state;
   }
 };
@@ -99,7 +99,7 @@ export const Desktop = (props: { windowCompositor: WindowCompositor, manager: Ap
   }, []);
 
 
-  const applications = applicationWindows.map(x => 
+  const applications = applicationWindows.map(x =>
     <WindowContainer
       key={x.window.id}
       window={x.window}
@@ -112,7 +112,7 @@ export const Desktop = (props: { windowCompositor: WindowCompositor, manager: Ap
   return (
     <div className={styles.desktop}>
       <FolderView
-        directory='/Users/joey/Desktop'
+        directory='/Users/abdullah/Desktop'
         apis={apis}
         onFileOpen={onFileOpen}
         localIconPosition={true}
@@ -120,6 +120,6 @@ export const Desktop = (props: { windowCompositor: WindowCompositor, manager: Ap
       />
 
       <div ref={parentNode} className={styles.applicationContainer}>{applications}</div>
-  </div>
+    </div>
   )
 }

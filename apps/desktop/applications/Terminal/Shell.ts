@@ -9,7 +9,7 @@ import { FileSystem } from "@/apis/FileSystem/FileSystem";
 import { isUniqueFile, pathLastEntry, pathPop } from "@/apis/FileSystem/util";
 import { stripAnsi } from "./TerminalManager";
 
-export const HomeDirectory = '/Users/joey/'
+export const HomeDirectory = '/Users/abdullah/'
 
 type CommandOutput = { type: 'stdout' } | { type: 'pipe' } | { type: 'output_redirection', filename: string };
 
@@ -32,12 +32,12 @@ function parseRedirection(fullCommand: string): Command[] {
     // Output functions, set last to the current index and transform the result
     function stdout(slice: string): Command {
       last = index;
-      return { slice, output: { type: 'stdout'} };
+      return { slice, output: { type: 'stdout' } };
     }
 
     function pipe(slice: string): Command {
       last = index;
-      return { slice, output: { type: 'pipe'} };
+      return { slice, output: { type: 'pipe' } };
     }
 
     function outputRedirection(slice: string, filename: string): Command {
@@ -108,7 +108,7 @@ export class Shell {
     private terminal: TerminalConnector,
     private applicationManager: BaseApplicationManager,
     private apis: SystemAPIs
-  ) {}
+  ) { }
 
   public getTerminal(): TerminalConnector {
     return this.terminal;
@@ -140,7 +140,7 @@ export class Shell {
 
     const topItems = pathItems.slice(-TopItems);
 
-    const isHomeDirectory = pathItems.length >= 2 && pathItems[0] === "Users" && pathItems[1] === "joey";
+    const isHomeDirectory = pathItems.length >= 2 && pathItems[0] === "Users" && pathItems[1] === "abdullah";
     const pathItemsDelta = pathItems.length - topItems.length;
 
     if (isHomeDirectory && pathItemsDelta <= 1) {
@@ -205,7 +205,7 @@ export class Shell {
       if (!fileName) { return Err('output redirection: Invalid file name'); }
 
       const rootDirectoryResult = fs.getDirectory(rootPath);
-      if (!rootDirectoryResult.ok) { return Err(`output redirection: ${rootPath}: No such file or directory`);  }
+      if (!rootDirectoryResult.ok) { return Err(`output redirection: ${rootPath}: No such file or directory`); }
 
       const root = rootDirectoryResult.value;
 
@@ -230,7 +230,7 @@ export class Shell {
 
       const node = nodeResult.value;
 
-      if(node.kind !== 'textfile') { return Err('output redirection: Invalid file or directory it needs to be a text file')}
+      if (node.kind !== 'textfile') { return Err('output redirection: Invalid file or directory it needs to be a text file') }
 
       node.content += content;
 
@@ -256,7 +256,7 @@ export class Shell {
       const previous = index > 0 ? redirection[index - 1] : null;
       const previousWasPipe = previous ? previous.output.type === 'pipe' : false;
 
-      const previousStdout  = previous ? `"${this.terminal.getResponseLines().join('\r\n')}"` : '';
+      const previousStdout = previous ? `"${this.terminal.getResponseLines().join('\r\n')}"` : '';
 
       const stdin = previousWasPipe ? part.slice + " " + previousStdout : part.slice;
       const args = parseCommand(stdin);

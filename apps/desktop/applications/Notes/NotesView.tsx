@@ -28,7 +28,7 @@ export default function NotesApplicationView(props: WindowProps) {
   const path = args;
 
   function createOnSave() {
-    const path = '/Users/joey/Documents/';
+    const path = '/Users/abdullah/Documents/';
 
     const documentsDirectory = fs.getDirectory(path);
     if (!documentsDirectory.ok) { return; }
@@ -36,7 +36,7 @@ export default function NotesApplicationView(props: WindowProps) {
     const template = t('filesystem.new_file');
     const title = generateUniqueNameForDirectory(documentsDirectory.value, template);
 
-    const noop = () => {};
+    const noop = () => { };
 
     application.compositor.prompt(windowContext.id, t('notes.create_file_instructions'), title)
       .then((title) => {
