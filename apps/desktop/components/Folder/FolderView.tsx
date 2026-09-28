@@ -1,4 +1,4 @@
-import { DirectoryContent, DirectoryEntry, NodeEventType, NodeRenameEvent, DirectorySettings, FileSystemDirectory, FileSystemNode, calculateNodePosition} from '@/apis/FileSystem/FileSystem';
+import { DirectoryContent, DirectoryEntry, NodeEventType, NodeRenameEvent, DirectorySettings, FileSystemDirectory, FileSystemNode, calculateNodePosition } from '@/apis/FileSystem/FileSystem';
 import { useState, useRef, useEffect, RefObject } from 'react';
 import dynamic from 'next/dynamic';
 import styles from '@/components/Folder/FolderView.module.css';
@@ -26,7 +26,7 @@ function SelectionBox(box: SelectionBox) {
     return <></>
   }
 
-  return <div className={styles['selection-box']} style={{width: box.width, height: box.height, top: box.y, left: box.x}}></div>
+  return <div className={styles['selection-box']} style={{ width: box.width, height: box.height, top: box.y, left: box.x }}></div>
 }
 
 const DraggingThreshold = 5;
@@ -59,7 +59,7 @@ export function FolderView(props: FolderViewProps) {
   function updateFiles(files: Chain<FolderIconEntry>) {
     localFiles.current = files;
     setFiles(files.toArray());
-  } 
+  }
 
   const ref: RefObject<HTMLDivElement | null> = useRef(null);
   const iconContainer: RefObject<HTMLDivElement | null> = useRef(null);
@@ -75,7 +75,7 @@ export function FolderView(props: FolderViewProps) {
   const fileDraggingOrigin = useRef({ x: 0, y: 0 });
   const fileDraggingFolderOrigin = useRef<Point | null>(null);
 
-  const fileDraggingSelection  = useRef<FolderIconEntry[]>([]);
+  const fileDraggingSelection = useRef<FolderIconEntry[]>([]);
   const fileDraggingCurrentNode: RefObject<Element | null> = useRef(null);
   const fileDraggingSession: RefObject<DragAndDropSession | null> = useRef(null);
 
@@ -87,7 +87,7 @@ export function FolderView(props: FolderViewProps) {
     const localX = point.x - dimensions.left;
     const localY = point.y - dimensions.top;
 
-    return { x: localX, y: localY};
+    return { x: localX, y: localY };
   }
 
   function getXCoordInIconContainer(x: number, container: HTMLDivElement): number {
@@ -107,7 +107,7 @@ export function FolderView(props: FolderViewProps) {
 
   function selectFile(position: Point) {
     const files = localFiles.current;
-    
+
     if (!iconContainer.current) { return; }
     const container = iconContainer.current;
     const point = getCoordinatesInIconContainer(getLocalCoordinates(position), container);
@@ -122,7 +122,7 @@ export function FolderView(props: FolderViewProps) {
       const toggleSelected = selected && !hasSelected;
 
       file.selected = toggleSelected;
-      
+
       if (toggleSelected) {
         files.moveToHead(node);
         hasSelected = true;
@@ -140,7 +140,7 @@ export function FolderView(props: FolderViewProps) {
     const container = iconContainer.current;
 
     const current = getLocalCoordinates(position);
-    
+
     const topLeftPoint = { x: Math.min(origin.x, current.x), y: Math.min(origin.y, current.y) };
     const bottomRightPoint = { x: Math.max(origin.x, current.x), y: Math.max(origin.y, current.y) };
 
@@ -152,7 +152,7 @@ export function FolderView(props: FolderViewProps) {
     };
 
     for (let node of files.iterFromHead()) {
-      const file = node.value; 
+      const file = node.value;
       const hitBox = FolderIconHitBox(file);
       file.selected = rectangleAnyIntersection(selectionRect, hitBox);
     }
@@ -213,13 +213,13 @@ export function FolderView(props: FolderViewProps) {
 
     const data: FileSystemItemDragData = {
       nodes: fileDraggingSelection.current.map(folderIcon => {
-      
+
         const offset = {
           x: origin.x - folderIcon.x,
           y: origin.y - folderIcon.y,
         };
 
-        return { item: folderIcon.entry.node, position: { x: 0, y: 0}, offset };
+        return { item: folderIcon.entry.node, position: { x: 0, y: 0 }, offset };
       })
     };
 
@@ -232,7 +232,7 @@ export function FolderView(props: FolderViewProps) {
       // NOTE(Joey): Not sure why the scrollOffset{x/y} need to be multiplied by 2
       fileDraggingSession.current = dragAndDrop.start(data, evt.clientX - scrollOffsetX * 2, evt.clientY - scrollOffsetY * 2);
     }
-    
+
     if (isDragging.current && fileDraggingSession.current) {
       // Propagate drag move event
       fileDraggingSession.current.move(evt.clientX - scrollOffsetX * 2, evt.clientY - scrollOffsetY * 2);
@@ -250,10 +250,10 @@ export function FolderView(props: FolderViewProps) {
 
         if (element.hasAttribute("data-window-root")) {
           break;
-        } 
+        }
       }
 
-      if (!dropPoint) { 
+      if (!dropPoint) {
         fileDraggingCurrentNode.current = null;
         return;
       }
@@ -268,12 +268,12 @@ export function FolderView(props: FolderViewProps) {
         };
       }
 
-      const moveEvent = new CustomEvent(FileSystemItemDragMove, { detail: data, bubbles: false }); 
+      const moveEvent = new CustomEvent(FileSystemItemDragMove, { detail: data, bubbles: false });
       dropPoint?.dispatchEvent(moveEvent);
 
       if (dropPoint !== fileDraggingCurrentNode.current) {
-        const enterEvent = new CustomEvent(FileSystemItemDragEnter, { detail: data, bubbles: false }); 
-        const leaveEvent = new CustomEvent(FileSystemItemDragLeave, { detail: data, bubbles: false }); 
+        const enterEvent = new CustomEvent(FileSystemItemDragEnter, { detail: data, bubbles: false });
+        const leaveEvent = new CustomEvent(FileSystemItemDragLeave, { detail: data, bubbles: false });
 
         fileDraggingCurrentNode.current?.dispatchEvent(leaveEvent);
         dropPoint?.dispatchEvent(enterEvent);
@@ -290,7 +290,7 @@ export function FolderView(props: FolderViewProps) {
     const coords = fileDraggingCurrentNode.current?.getBoundingClientRect();
     const origin = fileDraggingFolderOrigin.current;
 
-    if (!origin || !coords) {   
+    if (!origin || !coords) {
       fileDraggingSession.current?.drop(evt.clientX, evt.clientY);
       return;
     }
@@ -331,7 +331,7 @@ export function FolderView(props: FolderViewProps) {
     const fileSystemNode = iconEntry.entry.node;
     if (!fileSystemNode.editable) { return; }
 
-    iconEntry.editing = { active: true, value: iconEntry.entry.node.name, onSave: () => { stopRenamingFiles(); }};
+    iconEntry.editing = { active: true, value: iconEntry.entry.node.name, onSave: () => { stopRenamingFiles(); } };
 
     updateFiles(localFiles.current);
   }
@@ -344,7 +344,7 @@ export function FolderView(props: FolderViewProps) {
     for (const file of files.iterFromTail()) {
       if (file.value.editing.active) {
         fs.renameNode(file.value.entry.node, file.value.editing.value);
-        
+
         file.value.editing.active = false;
       }
     }
@@ -375,7 +375,7 @@ export function FolderView(props: FolderViewProps) {
   function handleInteractionStart(position: Point, interaction: Interaction) {
     if (!ref.current) { return; }
     if (!iconContainer.current) { return; }
-    
+
     const file = clickedFile(position);
 
     if (file) {
@@ -404,17 +404,17 @@ export function FolderView(props: FolderViewProps) {
         stopRenamingFiles();
 
         onFileOpen(file.iconEntry.entry.node, false);
-        
-        previousClickedFile.current = { file: null, timestamp: 0 };
-      } else 
-      if (renameFolder) {
-        renameFile(file.iconEntry);
 
         previousClickedFile.current = { file: null, timestamp: 0 };
-      } else {        
-        previousClickedFile.current = { file, timestamp: Date.now() };
-      }
-      
+      } else
+        if (renameFolder) {
+          renameFile(file.iconEntry);
+
+          previousClickedFile.current = { file: null, timestamp: 0 };
+        } else {
+          previousClickedFile.current = { file, timestamp: Date.now() };
+        }
+
     } else {
       stopRenamingFiles();
 
@@ -530,13 +530,13 @@ export function FolderView(props: FolderViewProps) {
       });
     }
 
-    updateFiles(chain);    
+    updateFiles(chain);
   }
 
   function reloadLocalFiles(directory: FileSystemDirectory, type: NodeEventType) {
     if (type.kind === 'refresh') { return; }
     if (!ref.current) { return; }
-    
+
     const container = ref.current;
 
     const existingChain = localFiles.current;
@@ -611,7 +611,7 @@ export function FolderView(props: FolderViewProps) {
   }
 
   function reloadFiles(directory: string, type: NodeEventType): FileSystemDirectory | null {
-    if (type.kind === 'rename') {      
+    if (type.kind === 'rename') {
       reloadRenamedDirectory(type);
 
       return null;
@@ -636,8 +636,8 @@ export function FolderView(props: FolderViewProps) {
       return reloadFiles(directory, type);
     }
 
-    const result = action({kind: 'update'});
-    
+    const result = action({ kind: 'update' });
+
     if (result) {
       return fs.subscribe(result, action);
     }
@@ -714,14 +714,14 @@ export function FolderView(props: FolderViewProps) {
         return Ok(file);
       }
     }
-    
+
     return Ok(dir.value);
   }
 
   function onFileDrop(evt: FileSystemItemDragEvent) {
     const files = localFiles.current;
     let parentsToUpdate: Map<number, FileSystemDirectory> = new Map();
-    
+
     if (!ref.current) { return; }
     const folder = ref.current;
 
@@ -732,7 +732,7 @@ export function FolderView(props: FolderViewProps) {
     let forceUpdate = !placingInLocalDirectory;
 
     const folderRect = folder.getBoundingClientRect();
-    
+
     const horizontal = {
       min: -IconWidth / 2,
       max: folderRect.width - (IconWidth / 2)
@@ -771,7 +771,7 @@ export function FolderView(props: FolderViewProps) {
         directoryEntry.x = positionX;
         directoryEntry.y = positionY;
       }
-      
+
       const folderIconEntry: FolderIconEntry = {
         entry: directoryEntry,
         x: positionX,
@@ -793,13 +793,13 @@ export function FolderView(props: FolderViewProps) {
     }
 
     if (forceUpdate) {
-      parentsToUpdate.forEach(x => fs.propagateNodeEvent(x, {kind: 'update'}));
-      fs.propagateNodeEvent(dir.value, {kind: 'update'});
+      parentsToUpdate.forEach(x => fs.propagateNodeEvent(x, { kind: 'update' }));
+      fs.propagateNodeEvent(dir.value, { kind: 'update' });
     } else {
       // Local Icon Position (Desktop mode) shouldn't update the rest of the views
       // As it should be isolated from the other views
       if (!useLocalIconPosition) {
-        fs.propagateNodeEvent(dir.value, {kind: 'refresh'});
+        fs.propagateNodeEvent(dir.value, { kind: 'refresh' });
       }
 
       updateFiles(files);
@@ -815,7 +815,7 @@ export function FolderView(props: FolderViewProps) {
     if (!dir.ok) { return; }
 
     const container = iconContainer.current;
-    
+
     const folderScrollWidth = container.scrollWidth;
     const folderScrollHeight = container.scrollHeight;
 
@@ -831,27 +831,31 @@ export function FolderView(props: FolderViewProps) {
     folder.addEventListener('pointerdown', onPointerDown, { passive: false });
     folder.addEventListener(FileSystemItemDragMove, onFileDropMove as EventListener);
     folder.addEventListener(FileSystemItemDragDrop, onFileDrop as EventListener);
-    
+
     const observer = new ResizeObserver(updateDirectoryDimensions);
     observer.observe(ref.current);
 
     // Set the correct width / height of the just opened window
     updateDirectoryDimensions();
-    
+
     return () => {
       folder.removeEventListener('touchstart', onTouchDown);
       folder.removeEventListener('pointerdown', onPointerDown);
       folder.removeEventListener(FileSystemItemDragMove, onFileDropMove as EventListener);
       folder.removeEventListener(FileSystemItemDragDrop, onFileDrop as EventListener);
-      
+
       observer.disconnect();
     };
   }, []);
 
-  useEffect(() => { 
-    const unsubscribe = loadFiles(directory);
+  useEffect(() => {
+    const dirNodes = fs.getDirectory(directory);
+    if (dirNodes.ok && ref.current) {
+      // Force update dimensions before loading files to ensure calculateNodePosition has correct data
+      updateDirectoryDimensions();
+    }
 
-    updateDirectoryDimensions();
+    const unsubscribe = loadFiles(directory);
 
     return () => {
       if (unsubscribe) { unsubscribe() };
@@ -863,9 +867,9 @@ export function FolderView(props: FolderViewProps) {
   });
 
   const selectionBox = SelectionBox(box);
-  
+
   return <>
-    <div 
+    <div
       ref={ref}
       className={styles.folder}
       data-drop-point="true"

@@ -368,8 +368,8 @@ export function createBaseFileSystem(): FileSystem {
   const henryIcon = { src: '/icons/icon-profile.png', alt: "Henry Heffernan's Portfolio" };
   fileSystem.addURL(desktop, 'Henry Heffernan', 'https://henryheffernan.com/', henryIcon, false);
 
-  const joeyIcon = { src: '/icons/icon-profile.png', alt: "Joey de Ruiter's GitHub" };
-  fileSystem.addURL(desktop, 'Joey de Ruiter', 'https://github.com/joeyderuiter/Portfolio-next', joeyIcon, false);
+  const abdullahIcon = { src: '/icons/icon-profile.png', alt: "Abdullah Saleh's GitHub" };
+  fileSystem.addURL(desktop, 'Abdullah Saleh', 'https://github.com/noobianlabs/Portfolio-next', abdullahIcon, false);
 
   const readmeText = `Hey, welcome to my portfolio website!
 
@@ -454,8 +454,8 @@ function entriesWithinSelection(entries: Point[], x: number, y: number, dimensio
 function generatePosition(iteration: number, settings: DirectorySettings, content: DirectoryContent, boundingBox: BoundingBox): { x: number, y: number } {
   const direction = settings.sortDirection;
   const origin = settings.sortOrigin;
-  const gridWidth = Math.floor(content.width / boundingBox.width);
-  const gridHeight = Math.floor(content.height / boundingBox.height);
+  const gridWidth = Math.max(1, Math.floor(content.width / boundingBox.width));
+  const gridHeight = Math.max(1, Math.floor(content.height / boundingBox.height));
 
   function positionX(iteration: number, direction: 'horizontal' | 'vertical'): number {
     switch (direction) {
@@ -486,8 +486,8 @@ function generatePosition(iteration: number, settings: DirectorySettings, conten
 }
 
 function generatePositionRange(settings: DirectorySettings, content: DirectoryContent, boundingBox: { width: number, height: number }): { x: number, y: number }[] {
-  const horizontalSteps = Math.floor(content.width / boundingBox.width);
-  const verticalSteps = Math.floor(content.height / boundingBox.height);
+  const horizontalSteps = Math.max(1, Math.floor(content.width / boundingBox.width));
+  const verticalSteps = Math.max(1, Math.floor(content.height / boundingBox.height));
 
   let steps = [];
 

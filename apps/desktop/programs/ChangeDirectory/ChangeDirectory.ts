@@ -6,7 +6,7 @@ function ChangeDirectory(shell: Shell, args: string[], apis: SystemAPIs): void {
   const fs = apis.fileSystem;
   let path = args[1] ?? null;
 
-  if (!path) { path = '/Users/joey/'; }
+  if (!path) { path = '/Users/abdullah/'; }
 
   const absolutePath = getAbsolutePathFromArgs(path, shell, true);
   const directory = fs.getDirectory(absolutePath);
