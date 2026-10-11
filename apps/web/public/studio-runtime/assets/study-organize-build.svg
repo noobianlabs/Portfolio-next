@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1152" viewBox="0 0 800 1152" role="img" aria-labelledby="title description">
+  <title id="title">Study. Organize. Build.</title>
+  <desc id="description">Original geometric studio print in cream, forest green, and orange. A circle, open grid, and ascending blocks accompany three working principles.</desc>
+  <rect width="800" height="1152" fill="#f0e9d9"/>
+  <g fill="none" stroke="#254238" stroke-width="2">
+    <path d="M54 56H746V1096H54Z"/>
+    <path d="M88 172H712M88 502H712M88 824H712"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#254238">
+    <text x="88" y="113" font-size="21" letter-spacing="5">A ROOM FOR PRACTICE</text>
+    <text x="88" y="286" font-size="74" font-weight="700" letter-spacing="-3">STUDY.</text>
+    <text x="88" y="596" font-size="66" font-weight="700" letter-spacing="-3">ORGANIZE.</text>
+    <text x="88" y="922" font-size="74" font-weight="700" letter-spacing="-3">BUILD.</text>
+    <text x="88" y="1060" font-size="16" letter-spacing="3">STUDIO PRINT / 01</text>
+  </g>
+  <circle cx="602" cy="377" r="80" fill="#ce633c"/>
+  <path d="M88 377H464M88 402H352M88 427H240" stroke="#254238" stroke-width="12"/>
+  <g stroke="#254238" stroke-width="9" fill="none">
+    <path d="M88 663H480M88 715H480M88 767H480M140 637V793M244 637V793M348 637V793M452 637V793"/>
+  </g>
+  <rect x="574" y="663" width="112" height="104" fill="#ce633c"/>
+  <g fill="#254238">
+    <path d="M502 1024V974H550V924H598V874H646V824H694V1024Z"/>
+  </g>
+  <circle cx="664" cy="874" r="12" fill="#f0e9d9"/>
+</svg>

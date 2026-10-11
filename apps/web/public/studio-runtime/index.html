@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#171a19"><meta name="description" content="Development preview of Abdullah Saleh’s explorable portfolio: software, study, and community practice."><meta name="robots" content="noindex, nofollow"><meta property="og:title" content="Abdullah Saleh · Revolutionary Studio · Studio preview"><meta property="og:description" content="Development preview of Abdullah Saleh’s explorable portfolio: software, study, and community practice."><meta property="og:type" content="website"><title>Abdullah Saleh · Revolutionary Studio · Studio preview</title><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%23171a19'/%3E%3Cpath d='M6 23V8h20M11 8v15h15M6 16h20' fill='none' stroke='%23eee5cc' stroke-width='1.5'/%3E%3Ccircle cx='23' cy='22' r='4' fill='%23bd4435'/%3E%3C/svg%3E"><link rel="stylesheet" href="./style.css"><script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/controls/OrbitControls.js":"./vendor/OrbitControls.js"}}</script></head>
+<body><a class="skip" href="#objects">Skip to objects</a><main id="studio"><div id="world" aria-label="Interactive 3D studio. Drag to orbit, scroll to zoom. Use the object buttons for keyboard access." role="application" tabindex="0"></div><div id="loading"><span class="loader" aria-hidden="true"></span><div class="startup-copy"><span id="startup-status" role="status" aria-live="polite">Opening the studio</span><a id="startup-classic" href="/portfolio" target="_top">Open the reading portfolio →</a></div></div>
+<header><div class="brand"><span class="brand-mark">R<span>·</span>S</span><div><span class="eyebrow">ABDULLAH SALEH / PEOPLE &gt; PROFIT</span><h1>Revolutionary Studio</h1></div></div><div class="header-links"><a href="/portfolio" target="_top">Reading portfolio</a><button id="help" class="round" aria-label="Show navigation help">?</button></div></header>
+<nav class="views" aria-label="Camera views"><button data-view="room" class="selected" aria-pressed="true">Room</button><button data-view="desk" aria-pressed="false">Desk</button><button data-view="poster" aria-pressed="false">Poster</button><span class="divider"></span><button id="walk" aria-pressed="false">Walk</button></nav>
+<div id="labels" aria-hidden="true"></div>
+<section class="intro" aria-label="Scene introduction"><span class="eyebrow">STUDY. ORGANIZE. BUILD.</span><h2>People &gt; profit.<br>In practice.</h2><p class="intro-copy">I’m Abdullah. Software engineer, developer advocate,<br class="desktop-break"> and community builder. Step inside my work.</p><div class="intro-actions"><button data-open="computer">Explore my work</button><a href="/portfolio" target="_top">Read the reading portfolio <span aria-hidden="true">↗</span></a></div><p id="control-hint">Or explore the room: drag to look · scroll to zoom</p></section>
+<div class="camera-tools"><button id="zoom-in" class="round" aria-label="Zoom in">+</button><button id="zoom-out" class="round" aria-label="Zoom out">−</button><button id="reset" class="round" aria-label="Reset view">↺</button></div>
+<nav id="objects" class="object-nav" aria-label="Explore objects"><button data-open="blueprint"><small>01</small> Blueprint</button><button data-open="poster"><small>02</small> Poster</button><button data-open="books"><small>03</small> Study notes</button><button data-open="computer"><small>04</small> Portfolio</button><button id="lamp" aria-pressed="true"><small>05</small> Light <span id="light-state">on</span></button></nav>
+<div id="walk-pad" aria-label="Walk controls" hidden><button data-move="forward" aria-label="Walk forward">▲</button><div><button data-move="left" aria-label="Step left">◀</button><button data-move="backward" aria-label="Walk backward">▼</button><button data-move="right" aria-label="Step right">▶</button></div></div>
+<section id="computer-controls" aria-label="Computer controls" hidden><div><span class="eyebrow">NOOBIAN LABS</span><strong>Abdullah’s portfolio</strong></div><button id="computer-back">Back to room</button><button id="computer-expand" aria-pressed="false">Expand screen</button><a href="/portfolio" target="_blank" rel="noopener noreferrer">Open separately</a><button id="computer-retry" type="button">Retry view</button><p>Projects, about, and contact. Esc or Back to room returns to the studio.</p></section>
+<div id="computer-screen" hidden><div id="computer-loading" role="status"><strong id="computer-loading-title">Opening your portfolio…</strong><p id="computer-loading-help">You can retry this view or open the reading portfolio separately.</p></div><iframe id="desktop-frame" title="Abdullah Saleh portfolio" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-popups allow-popups-to-escape-sandbox" tabindex="0"></iframe></div>
+<div id="status" class="sr-only" role="status" aria-live="polite"></div>
+<section id="fallback" hidden><span class="eyebrow">THE STUDIO, IN DETAIL</span><h2>Your browser couldn’t open the 3D room</h2><p>You can still explore the blueprint, projects, poster, and study notes below. Try another browser with WebGL enabled for the room.</p><a class="fallback-link" href="/portfolio" target="_top">Read Abdullah’s portfolio →</a></section>
+<dialog id="details" aria-labelledby="detail-title"><button id="close-details" class="close" aria-label="Close detail panel">×</button><div id="detail-content"></div></dialog>
+<noscript><style>#loading,#world,.views,.camera-tools,.object-nav,.intro{display:none!important}.no-script{z-index:22;inset:25% 0 auto;max-width:650px;line-height:1.7}body{overflow:auto}</style><div class="no-script"><span class="eyebrow">ABDULLAH SALEH / PEOPLE &gt; PROFIT</span><h2>The work is here,<br>with or without the room.</h2><p>The 3D studio needs JavaScript. My projects, background, and contact details are available in the reading portfolio.</p><a href="/portfolio" target="_top">Explore my portfolio →</a></div></noscript>
+</main><script id="studio-startup-recovery">
+// This classic script stays independent of the studio's module graph.
+(() => {
+  const loader = document.getElementById('loading');
+  if (!loader) return;
+
+  const status = document.getElementById('startup-status');
+  let settled = false;
+  let timedOut = false;
+  let timer = null;
+
+  function isVisible() {
+    // The inline target detects the start of a fade, before computed opacity
+    // reaches zero. The host still owns the transition and eventual hiding.
+    if (loader.hidden || loader.style.opacity === '0') return false;
+    const style = getComputedStyle(loader);
+    return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+  }
+
+  function settle() {
+    if (settled) return;
+    settled = true;
+    if (timer !== null) clearTimeout(timer);
+    timer = null;
+    const restoreFocus = loader.contains(document.activeElement);
+    loader.inert = true;
+    if (restoreFocus) document.querySelector('.header-links a')?.focus();
+  }
+
+  // A late script load may have missed the event while the host was fading.
+  if (!isVisible()) {
+    settle();
+    return;
+  }
+
+  document.addEventListener('studio:startup-settled', settle, { once: true });
+  timer = setTimeout(() => {
+    if (settled || timedOut) return;
+    timedOut = true;
+    timer = null;
+    if (isVisible() && status) status.textContent = 'The studio is taking longer to open.';
+  }, 9000);
+})();
+</script><script type="module" src="./studio.js"></script></body></html>

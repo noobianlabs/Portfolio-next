@@ -1,0 +1,188 @@
+.page {
+  --forest: #202923;
+  --paper: #eee8d7;
+  --ink: #27352d;
+  --muted-ink: #59675a;
+  --muted: #bdc4b6;
+  --rust: #ac492d;
+  --coral: #ed8465;
+  --paper-rule: #c9ccbc;
+  --forest-rule: #475247;
+  --control-border: #7b8375;
+  --focus: var(--coral);
+  --gutter: clamp(20px, 5vw, 88px);
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+  font: 16px/1.6 Arial, Helvetica, sans-serif;
+  font-synthesis: none;
+  overflow-wrap: anywhere;
+  color: var(--paper);
+  background: var(--forest);
+}
+.page *, .page *::before, .page *::after { box-sizing: border-box; }
+.page a { color: inherit; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+.page :where(a, button, summary):focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+.skip:not(:focus), .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.skip:focus { position: fixed; top: 12px; left: 12px; z-index: 10; background: var(--forest); padding: 12px 16px; }
+.topbar { min-height: 72px; padding: 12px var(--gutter); border-bottom: 1px solid var(--forest-rule); display: flex; align-items: center; gap: 28px; }
+.identity { display: inline-flex; align-items: center; gap: 16px; min-height: 44px; font: 30px/1.2 Georgia, serif; text-decoration: none; }
+.identity span { font: 14px/1.5 Arial, Helvetica, sans-serif; }
+.location { margin-left: auto; color: var(--muted); font-size: 14px; }
+.roomLink { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; }
+.intro { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: center; gap: 8%; padding: 40px var(--gutter); }
+.eyebrow { margin: 0 0 16px; font: 12px/1.5 monospace; letter-spacing: 1.5px; color: var(--muted); }
+.page h1 { margin: 0 0 18px; font: 400 clamp(48px, 7.2vw, 100px)/1.04 Georgia, serif; letter-spacing: -3px; }
+.page h1 span { color: var(--coral); }
+.lede { max-width: 62ch; margin: 0; font-size: 18px; line-height: 1.65; }
+.indexCard { padding: 18px 0 0; border-top: 2px solid var(--coral); }
+.indexCard p { margin: 14px 0; font: 22px/1.5 Georgia, serif; }
+.indexCard a { display: inline-flex; align-items: center; min-height: 44px; font-size: 16px; color: var(--coral); }
+.sectionNav { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px 28px; padding: 8px var(--gutter); background: var(--forest); border-block: 1px solid var(--forest-rule); }
+.sectionNav a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; text-decoration: none; }
+.sectionNav a:hover { color: var(--coral); text-decoration: underline; }
+.page h2 { margin: 0 0 24px; font: 400 clamp(34px, 3.7vw, 54px)/1.12 Georgia, serif; letter-spacing: -1.2px; }
+.work { padding: 48px var(--gutter) 64px; background: var(--paper); color: var(--ink); --focus: var(--rust); }
+.work .eyebrow { color: var(--muted-ink); }
+.sectionHeading { margin-bottom: 28px; }
+.sectionHeading h2 br { display: none; }
+.workGuide { max-width: 62ch; margin: 0; font-size: 16px; line-height: 1.65; color: var(--muted-ink); }
+.projects { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.project { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; min-width: 0; margin: 0; padding: 28px 0; border-top: 1px solid var(--paper-rule); scroll-margin-top: 24px; }
+.project:last-child { border-bottom: 1px solid var(--muted-ink); }
+.projectIdentity, .projectBody { min-width: 0; }
+.projectMeta { display: flex; align-items: baseline; gap: 18px; color: var(--muted-ink); font: 12px/1.6 monospace; letter-spacing: 0.6px; }
+.projectMeta span:first-child { flex: 0 0 auto; color: var(--rust); font-size: 15px; }
+.project h3 { margin: 12px 0 14px; font: 400 clamp(28px, 2.65vw, 38px)/1.14 Georgia, serif; letter-spacing: -0.6px; }
+.project p { margin: 0 0 16px; font-size: 16px; line-height: 1.7; color: var(--ink); }
+.project a { font-size: 16px; color: var(--rust); }
+.project h3 .projectTitleLink { font: inherit; color: inherit; text-decoration: none; }
+.projectTitleLink { display: block; min-height: 44px; }
+.project h3 .projectTitleLink:hover { text-decoration: underline; }
+.projectLinkMark { color: var(--rust); font: 20px/1 Arial, Helvetica, sans-serif; white-space: nowrap; }
+.project .workType { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin: 0; font-size: 16px; line-height: 1.5; }
+.workType > span { border-left: 2px solid var(--rust); padding-left: 10px; }
+.workType a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+.project .tags { margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted-ink); }
+.projectNotes { margin-top: 16px; }
+.projectNotes summary { min-height: 44px; padding: 10px 0; color: var(--rust); font-size: 16px; line-height: 1.5; cursor: pointer; list-style-position: inside; text-decoration: underline; text-underline-offset: 5px; }
+.projectNotes[open] summary { border-bottom: 1px solid var(--paper-rule); }
+.projectNoteContent { padding: 18px 0 0; }
+.projectNoteContent p { font-size: 16px; line-height: 1.75; }
+.projectNoteContent .noteRole { margin: 0 0 16px; font-size: 16px; line-height: 1.5; font-weight: 700; color: var(--muted-ink); }
+.sourceLink { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.filters[hidden], .project[hidden] { display: none !important; }
+.filters { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding: 0 0 24px; border-bottom: 1px solid var(--muted-ink); }
+.filters:not([hidden]) + .project { border-top: 0; }
+.filterButtons { display: flex; flex-wrap: wrap; gap: 8px; }
+.filterButtons button { min-height: 44px; padding: 10px 14px; border: 1px solid var(--control-border); border-radius: 2px; background: var(--paper); color: var(--ink); font: 16px/1.4 Arial, Helvetica, sans-serif; cursor: pointer; }
+.filterButtons button:hover { border-color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+.filterButtons button[aria-pressed=true] { border-color: var(--forest); background: var(--forest); color: var(--paper); text-decoration: none; }
+.projectCount { margin: 0; color: var(--muted-ink); font: 13px/1.6 monospace; }
+.about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 0 10%; padding: 56px var(--gutter); background: var(--paper); color: var(--ink); border-top: 1px solid var(--paper-rule); --focus: var(--rust); }
+.about .eyebrow { grid-column: 1 / -1; color: var(--muted-ink); }
+.aboutCopy p { margin: 0 0 20px; font-size: 18px; line-height: 1.75; }
+.contact { padding: 56px var(--gutter) 64px; }
+.email { display: inline-flex; align-items: center; min-height: 44px; font: clamp(20px, 3vw, 38px)/1.4 Georgia, serif; color: var(--coral) !important; }
+.contactLinks { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 24px; }
+.contactLinks a { display: inline-flex; align-items: center; min-height: 44px; font-size: 16px; }
+.footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; padding: 20px var(--gutter); border-top: 1px solid var(--forest-rule); color: var(--muted); font-size: 14px; }
+.footer a { display: inline-flex; align-items: center; min-height: 44px; }
+.printContext { display: none; }
+
+@media (min-width: 1100px) {
+  .work { display: grid; grid-template-columns: minmax(180px, 0.62fr) minmax(0, 2.6fr); gap: 48px 5%; }
+  .sectionHeading { position: sticky; top: 96px; align-self: start; margin: 0; }
+  .sectionHeading h2 br { display: initial; }
+  .project { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr); gap: 36px; padding-block: 32px; }
+}
+@media (max-width: 700px) {
+  .topbar { gap: 16px; }
+  .identity { gap: 12px; }
+  .identity span { font-size: 13px; }
+  .location { display: none; }
+  .roomLink { margin-left: auto; }
+  .intro { grid-template-columns: minmax(0, 1fr); padding-block: 32px; }
+  .indexCard { display: none; }
+  .page h1 { letter-spacing: -2px; }
+  .sectionNav { gap: 8px 20px; }
+  .work { padding-block: 32px 48px; }
+  .project { gap: 16px; }
+  .filters { padding-bottom: 20px; }
+  .filterButtons button { padding-inline: 12px; }
+  .about { grid-template-columns: minmax(0, 1fr); padding-block: 40px; }
+  .aboutCopy p { font-size: 17px; }
+  .contact { padding-block: 40px 48px; }
+}
+@media (max-width: 400px) {
+  .sectionNav { position: static; gap: 8px 16px; }
+}
+.embedded .topbar { min-height: 64px; padding-block: 8px; }
+.embedded .intro { grid-template-columns: minmax(0, 1fr); padding-block: 24px; }
+.embedded .intro .eyebrow { margin-bottom: 8px; }
+.embedded h1 { margin-bottom: 12px; font-size: clamp(40px, 5vw, 64px); letter-spacing: -2px; }
+.embedded .lede { max-width: 70ch; font-size: 16px; }
+.embedded .indexCard { display: none; }
+.embedded .work { display: block; padding-block: 28px 48px; }
+.embedded .sectionHeading { position: static; margin: 0 0 24px; }
+.embedded .sectionHeading .eyebrow { margin-bottom: 8px; }
+.embedded .sectionHeading h2 { margin-bottom: 12px; font-size: 32px; }
+.embedded .sectionHeading h2 br { display: none; }
+@media (min-width: 700px) {
+  .embedded .sectionHeading { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 0 24px; }
+  .embedded .sectionHeading .eyebrow { grid-column: 1 / -1; }
+  .embedded .sectionHeading h2 { margin-bottom: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page { scroll-behavior: auto; }
+}
+
+@media print {
+  @page { margin: 15mm; }
+  /* The original homepage fixes these elements. Override only while this route exists. */
+  :global(html):has(.page), :global(body):has(.page), :global(#__next):has(.page) {
+    position: static; width: auto; height: auto; overflow: visible; background: #fff;
+  }
+  .page { position: static; width: auto; height: auto; overflow: visible; background: #fff; color: #111; font-size: 10pt; line-height: 1.45; }
+  .page *, .page *::before, .page *::after { color: #111 !important; background: transparent !important; box-shadow: none !important; text-shadow: none !important; }
+  .page * { min-height: 0 !important; }
+  .skip, .sectionNav, .roomLink, .indexCard, .filters, .filters[hidden],
+  .page button, .page details, .projectNoteContent, .projectLinkMark,
+  .page a [aria-hidden="true"], .workGuide, .footer a { display: none !important; }
+  .printContext { display: block; }
+  .topbar, .intro, .work, .embedded .work, .projects, .about, .contactLinks, .sectionHeading, .embedded .sectionHeading { display: block; }
+  .sectionHeading, .embedded .sectionHeading { position: static; }
+  .topbar, .embedded .topbar, .intro, .embedded .intro, .work, .embedded .work, .about, .contact, .footer { padding: 0; margin: 0 0 6mm; border: 0; }
+  .sectionHeading, .embedded .sectionHeading { margin: 0 0 3mm; }
+  .sectionHeading h2 br { display: none; }
+  .project, .project[hidden] { display: block !important; }
+  .project { margin: 0 0 4mm; padding: 4mm 0 0; border-top: 1px solid #bbb; break-inside: avoid-page; page-break-inside: avoid; }
+  .project:last-child { border-bottom: 0; }
+  .page h2, .page h3, .sectionHeading { break-after: avoid-page; page-break-after: avoid; }
+  .page p { orphans: 2; widows: 2; }
+  .identity { font-size: 16pt !important; }
+  .identity span { font-size: 11pt; }
+  .location { display: inline-block; margin: 0 0 0 4mm; font-size: 9pt; }
+  .page h1, .embedded h1 { margin: 0 0 3mm; font-size: 26pt; line-height: 1.1; letter-spacing: -0.4pt; }
+  .page h2, .embedded .sectionHeading h2 { margin: 0 0 3mm; font-size: 18pt; line-height: 1.2; letter-spacing: -0.2pt; }
+  .project h3 { margin: 2mm 0; font-size: 14pt; line-height: 1.2; letter-spacing: 0; }
+  .page p { margin: 0 0 2mm !important; font-size: 10pt !important; line-height: 1.45 !important; }
+  .page .eyebrow, .page .printContext { font-size: 8pt !important; letter-spacing: 0.5pt; }
+  .projectMeta { display: block; font-size: 8pt; line-height: 1.4; letter-spacing: 0; }
+  .projectMeta span:first-child { margin-right: 3mm; font-size: inherit; }
+  .project .workType { display: block; }
+  .workType > span { border-left: 1px solid #777; padding-left: 3mm; }
+  .page a { font-size: inherit !important; }
+  .page .email { color: #111 !important; font-size: 12pt !important; }
+  .contactLinks { margin-top: 3mm; }
+  .workType a, .contactLinks a { display: block; margin: 1mm 0; }
+  .footer { font-size: 8pt; }
+  .workType a[href^="https://"]::after, .contactLinks a[href^="https://"]::after {
+    content: " (" attr(href) ")"; display: block; font-size: 8.5pt; line-height: 1.3; white-space: normal; overflow-wrap: anywhere; word-break: break-word;
+  }
+}

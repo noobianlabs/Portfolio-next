@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "access": "public",
+  "automaticDiscovery": false,
+  "posters": [
+    {
+      "id": "study-organize-build",
+      "title": "Study. Organize. Build.",
+      "image": "./assets/study-organize-build.svg",
+      "alt": "An original cream, forest green, and orange geometric print with the words Study, Organize, Build.",
+      "credit": "Studio print No. 01 \u00b7 Original geometric artwork",
+      "source": "./assets/study-organize-build.svg",
+      "rights": "Original geometric artwork created for this studio. No third-party artwork is included."
+    }
+  ]
+}
