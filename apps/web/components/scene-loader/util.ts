@@ -1,11 +1,11 @@
 import { isSafari } from "../renderer/util";
 
 export function detectWebGL(): boolean {
-  var canvas = document.createElement('canvas');
-
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-
-  return !!gl && gl instanceof WebGLRenderingContext;
+  try {
+    return Boolean(document.createElement('canvas').getContext('webgl2'));
+  } catch {
+    return false;
+  }
 }
 
 export function isDebug(): boolean {

@@ -123,10 +123,10 @@ function DisplayWebGLError() {
     <div className={styles['loading-progress']} style={{ overflowY: 'auto' }}>
       <OperatingSystemStats />
       <div className={styles['error-container']}>
-        <h3>ERROR: No WebGL detected</h3>
-        <p>WebGL is required to run the interactive scene.</p>
+        <h3>ERROR: No WebGL 2 detected</h3>
+        <p>WebGL 2 is required to run the interactive scene.</p>
         <p><a href="/portfolio">Read my portfolio without WebGL</a>.</p>
-        <p>Please enable it or switch to a browser that supports WebGL</p>
+        <p>Please enable it or switch to a browser that supports WebGL 2</p>
         <p>Or if you want to download my CV, you can do so from <a href="/assets/cv/Abdullah_Saleh_resume.pdf" target="_blank">here</a>.</p>
       </div>
     </div>
