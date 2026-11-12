@@ -40,21 +40,28 @@ export function writeOutCharsStreaming(
 ): () => void {
   let index = 0;
   let cancelled = false;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
 
   function writeChar() {
+    timeout = undefined;
+    if (cancelled) { return; }
     const string = stream();
 
     const slice = string.slice(0, ++index);
     output(slice);
 
     if (index < string.length && cancelled === false) {
-      setTimeout(writeChar, timeBetweenInMs);
+      timeout = setTimeout(writeChar, timeBetweenInMs);
     }
   }
 
   writeChar();
 
-  return () => { cancelled = true; }
+  return () => {
+    cancelled = true;
+    if (timeout !== undefined) { clearTimeout(timeout); }
+    timeout = undefined;
+  }
 }
 
 export function writeOutChars(value: string, output: (value: string) => void, timeBetweenInMs: number): () => void {
