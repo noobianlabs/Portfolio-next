@@ -1,5 +1,5 @@
 import styles from './Desktop.module.css';
-import React, { useEffect, useRef, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { Window, WindowApplication, WindowCompositor } from '../WindowManagement/WindowCompositor';
 import { WindowEvent } from '../WindowManagement/WindowEvents';
 import dynamic from 'next/dynamic';
@@ -70,7 +70,7 @@ const applicationReducer = (windowCompositor: WindowCompositor) => {
 export const Desktop = (props: { windowCompositor: WindowCompositor, manager: ApplicationManager, apis: SystemAPIs }) => {
   const { windowCompositor, manager, apis } = props;
 
-  const parentNode = useRef<HTMLDivElement>(null);
+  const [parentNode, setParentNode] = useState<HTMLDivElement | null>(null);
 
   const reducer = applicationReducer(windowCompositor);
   const [applicationWindows, dispatch] = useReducer(reducer, []);
@@ -86,17 +86,14 @@ export const Desktop = (props: { windowCompositor: WindowCompositor, manager: Ap
       dispatch(evt);
     });
 
-    if (parentNode.current) {
-      const desktop = parentNode.current;
-
-      windowCompositor.setSize(
-        desktop.clientWidth,
-        desktop.clientHeight
-      )
-    }
-
     return () => { unsubscribe(); }
-  }, []);
+  }, [windowCompositor]);
+
+  useEffect(() => {
+    if (parentNode) {
+      windowCompositor.setSize(parentNode.clientWidth, parentNode.clientHeight);
+    }
+  }, [parentNode, windowCompositor]);
 
 
   const applications = applicationWindows.map(x =>
@@ -105,7 +102,7 @@ export const Desktop = (props: { windowCompositor: WindowCompositor, manager: Ap
       window={x.window}
       WindowApp={x.application}
       windowCompositor={windowCompositor}
-      parent={parentNode.current}
+      parent={parentNode}
     />
   );
 
@@ -119,7 +116,7 @@ export const Desktop = (props: { windowCompositor: WindowCompositor, manager: Ap
         allowOverflow={false}
       />
 
-      <div ref={parentNode} className={styles.applicationContainer}>{applications}</div>
+      <div ref={setParentNode} className={styles.applicationContainer}>{applications}</div>
     </div>
   )
 }

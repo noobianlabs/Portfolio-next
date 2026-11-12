@@ -44,22 +44,17 @@ function EditTitle(props: { entry: FolderIconEntry }) {
 
   const ref = useRef<HTMLInputElement>(null);
 
-  const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(entry.editing.value);
 
   useEffect(() => {
     if (ref.current) {
       ref.current.focus();
     }
-  }, [isEditing])
-
-  useEffect(() => {
-    setIsEditing(true);
   }, []);
 
   function onChange(value: string) {
     setEditText(value);
-    entry.editing.value = value;
+    entry.editing.onChange?.(value);
   }
 
   function onSave() {
@@ -76,6 +71,7 @@ function EditTitle(props: { entry: FolderIconEntry }) {
       value={editText}
       onChange={evt => onChange(evt.target.value)}
       onKeyDown={evt => evt.key === 'Enter' && onSave() }
+      onBlur={onSave}
     />
   )
 }
@@ -166,7 +162,7 @@ export type FolderIconEntry = {
   y: number
   selected: boolean,
   dragging: boolean,
-  editing: { active: boolean, value: string, onSave?: () => void }
+  editing: { active: boolean, value: string, onSave?: () => void, onChange?: (value: string) => void }
 }
 
 export default function FolderIcon(props: { folderIconEntry: FolderIconEntry, index: number }) {

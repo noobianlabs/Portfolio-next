@@ -57,8 +57,8 @@ class Origin {
 
 // TODO: Maybe performance gain? It should be possible to bind the window events to a singular component before these get rendered.
 // So we don't have to process all these window events
-const Resizable = (props: { windowData: Window, windowCompositor: WindowCompositor, parent: HTMLDivElement, isMaximized: RefObject<boolean> }) => {
-  const { windowData, windowCompositor, parent, isMaximized } = props;
+const Resizable = (props: { windowData: Window, windowCompositor: WindowCompositor, parent: HTMLDivElement, onResizeStart: () => void }) => {
+  const { windowData, windowCompositor, parent, onResizeStart } = props;
 
   const [resizing, setResizing] = useState(false);
   const [cursor, setCursor] = useState('auto');
@@ -118,6 +118,9 @@ const Resizable = (props: { windowData: Window, windowCompositor: WindowComposit
     const node = output.current;
     if (node === null) { return; }
 
+    const currentWindow = windowCompositor.getById(windowData.id);
+    if (!currentWindow) { return; }
+
     // Register the event listeners here, so we don't pollute the window with all event listeners
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointermove', onPointerMove);
@@ -130,19 +133,19 @@ const Resizable = (props: { windowData: Window, windowCompositor: WindowComposit
     const bb = node.getBoundingClientRect();
 
     setResizing(true);
-    isMaximized.current = false;
+    onResizeStart();
 
     origin.current.cursor = { x: evt.clientX, y: evt.clientY };
 
     origin.current.window = {
-      x: windowData.x,
-      y: windowData.y,
-      width: windowData.width,
-      height: windowData.height
+      x: currentWindow.x,
+      y: currentWindow.y,
+      width: currentWindow.width,
+      height: currentWindow.height
     };
 
-    const correctedWindowY = windowData.y + parent.offsetTop;
-    const correctedWindowX = windowData.x + parent.offsetLeft;
+    const correctedWindowY = currentWindow.y + parent.offsetTop;
+    const correctedWindowX = currentWindow.x + parent.offsetLeft;
 
     resizeAxis.split('').forEach(x => {
       switch (x) {
@@ -150,13 +153,13 @@ const Resizable = (props: { windowData: Window, windowCompositor: WindowComposit
           origin.current.offset.y = origin.current.cursor.y - correctedWindowY;
           break;
         case 's':
-          origin.current.offset.y = origin.current.cursor.y - (correctedWindowY + windowData.height);
+          origin.current.offset.y = origin.current.cursor.y - (correctedWindowY + currentWindow.height);
           break;
         case 'w':
           origin.current.offset.x = origin.current.cursor.x - correctedWindowX;
           break;
         case 'e':
-          origin.current.offset.x = origin.current.cursor.x - (correctedWindowX + windowData.width);
+          origin.current.offset.x = origin.current.cursor.x - (correctedWindowX + currentWindow.width);
           break;
       }
     });
@@ -180,15 +183,18 @@ const Resizable = (props: { windowData: Window, windowCompositor: WindowComposit
   function onPointerMove(evt: PointerEvent) {
     if (!isDown.current) { return; }
 
+    const currentWindow = windowCompositor.getById(windowData.id);
+    if (!currentWindow) { return; }
     const original = {
-      x: windowData.x,
-      y: windowData.y,
-      height: windowData.height,
-      width: windowData.width,
+      x: currentWindow.x,
+      y: currentWindow.y,
+      height: currentWindow.height,
+      width: currentWindow.width,
     };
+    const geometry = { ...original };
 
-    const windowMinHeight = windowData.minimalHeight;
-    const windowMinWidth = windowData.minimalWidth;
+    const windowMinHeight = currentWindow.minimalHeight;
+    const windowMinWidth = currentWindow.minimalWidth;
 
     const windowMaxHeight = window.innerHeight;
     const windowMaxWidth = window.innerWidth;
@@ -221,16 +227,16 @@ const Resizable = (props: { windowData: Window, windowCompositor: WindowComposit
           const clampedY = Math.min(windowY - deltaY, maxDelta);
           const clampedHeight = clamp(windowHeight + deltaY, windowMinHeight, windowMaxHeight);
 
-          windowData.y = clampedY;
-          windowData.height = clampedHeight;
+          geometry.y = clampedY;
+          geometry.height = clampedHeight;
         } break;
         case 'e': {
           const clampedWidth = clamp(windowWidth - deltaX, windowMinWidth, windowMaxWidth);
-          windowData.width = clampedWidth;
+          geometry.width = clampedWidth;
         } break;
         case 's': {
           const clampedHeight = clamp(windowHeight - deltaY, windowMinHeight, windowMaxHeight);
-          windowData.height = clampedHeight;
+          geometry.height = clampedHeight;
         } break;
         case 'w': {
           const maxDelta = windowX + (windowWidth - windowMinWidth);
@@ -238,16 +244,16 @@ const Resizable = (props: { windowData: Window, windowCompositor: WindowComposit
           const clampedX = Math.min(windowX - deltaX, maxDelta);
           const clampedWidth = clamp(windowWidth + deltaX, windowMinWidth, windowMaxWidth);
 
-          windowData.x = clampedX;
-          windowData.width = clampedWidth;
+          geometry.x = clampedX;
+          geometry.width = clampedWidth;
         } break;
       }
     }
 
-    const moved = original.x !== windowData.x || original.y !== windowData.y;
-    const resized = original.height !== windowData.height || original.width !== windowData.width;
+    const moved = original.x !== geometry.x || original.y !== geometry.y;
+    const resized = original.height !== geometry.height || original.width !== geometry.width;
 
-    windowCompositor.update(windowData, { moved, resized });
+    windowCompositor.updateGeometry(windowData.id, geometry, { moved, resized });
   }
 
   function onPointerMoveOnElement(evt: PointerEvent) {
@@ -602,7 +608,7 @@ export default function WindowContainer(props: { window: Window, WindowApp: Wind
           windowData={window}
           windowCompositor={windowCompositor}
           parent={parent}
-          isMaximized={maximized} />}
+          onResizeStart={() => { maximized.current = false; }} />}
 
         <div className={contentContainerClasses}>
           {header}

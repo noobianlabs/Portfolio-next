@@ -331,7 +331,12 @@ export function FolderView(props: FolderViewProps) {
     const fileSystemNode = iconEntry.entry.node;
     if (!fileSystemNode.editable) { return; }
 
-    iconEntry.editing = { active: true, value: iconEntry.entry.node.name, onSave: () => { stopRenamingFiles(); }};
+    iconEntry.editing = {
+      active: true,
+      value: iconEntry.entry.node.name,
+      onChange: (value: string) => { iconEntry.editing.value = value; },
+      onSave: () => { stopRenamingFiles(); }
+    };
 
     updateFiles(localFiles.current);
   }
@@ -346,10 +351,11 @@ export function FolderView(props: FolderViewProps) {
         fs.renameNode(file.value.entry.node, file.value.editing.value);
         
         file.value.editing.active = false;
+        update = true;
       }
     }
 
-    if (update) {
+    if (update && localFiles.current === files) {
       updateFiles(files);
     }
   }

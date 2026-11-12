@@ -246,6 +246,22 @@ export class WindowCompositor {
     this.publish(UpdateWindowEvent(window.id, moved, resized));
   }
 
+  public updateGeometry(
+    windowId: number,
+    geometry: Pick<Window, 'x' | 'y' | 'width' | 'height'>,
+    updateOptions?: { moved?: boolean, resized?: boolean }
+  ): void {
+    const node = this.windowNodeLookup[windowId];
+    if (!node) { return; }
+
+    // Retain the live identity held by application-local compositors and listeners.
+    node.value.x = geometry.x;
+    node.value.y = geometry.y;
+    node.value.width = geometry.width;
+    node.value.height = geometry.height;
+    this.publish(UpdateWindowEvent(windowId, updateOptions?.moved ?? false, updateOptions?.resized ?? false));
+  }
+
   public close(windowId: number): void {
     const node = this.windowNodeLookup[windowId];
     if (!node) { return; }

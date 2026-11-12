@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useSmallWindow } from './useSmallWindow';
 import { LoadingManager } from "three";
 import { Renderer, RendererScenes } from "../renderer/Renderer";
 import { AssetManager, LoadingProgress, LoadingProgressEntry, UpdateAction } from "./AssetManager";
@@ -73,21 +74,7 @@ function ShowLoadingResources(loadingProgress: LoadingProgress) {
 
 function ShowUserMessage(props: { onClick: () => void }) {
   const onClick = props.onClick;
-  const [smallWindow, setSmallWindow] = useState(false);
-
-  function onResize() {
-    setSmallWindow(isMobileDevice());
-  }
-
-  useEffect(() => {
-    onResize();
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    }
-  }, []);
+  const smallWindow = useSmallWindow();
 
   return (<>
     <div className={styles['user-message']}>
@@ -145,6 +132,18 @@ function DisplayWebGLError() {
   );
 }
 
+function DisplaySceneLoadError() {
+  return (
+    <div className={styles['loading-progress']} style={{ overflowY: 'auto' }}>
+      <OperatingSystemStats />
+      <div className={styles['error-container']} role="alert">
+        <h3>The interactive scene couldn&apos;t load.</h3>
+        <p>You can <a href="/portfolio">read my portfolio</a> or <a href="/assets/cv/Abdullah_Saleh_resume.pdf" target="_blank">download my CV</a>.</p>
+      </div>
+    </div>
+  );
+}
+
 function DisplayLoadingProgress(props: { loadingProgress: LoadingProgress }) {
   const loadingProgress = props.loadingProgress;
 
@@ -153,6 +152,7 @@ function DisplayLoadingProgress(props: { loadingProgress: LoadingProgress }) {
   return (<>
     <div className={styles['loading-progress']}>
       <OperatingSystemStats />
+      <p><a href="/portfolio">Read my portfolio instead</a>.</p>
       <ShowBios />
       {loadingResources}
       <DisplayLoadingFooter />
@@ -182,6 +182,7 @@ function LoadingUnderscore() {
 
 export function SceneLoader() {
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [showProgress, setShowProgress] = useState(true);
   const [showMessage, setShowMessage] = useState(true);
   const [showLoadingUnderscore, setLoadingUnderscore] = useState(true);
@@ -222,13 +223,21 @@ export function SceneLoader() {
     const abortController = new AbortController();
 
     const fetchData = async () => {
-      const { updateActions } = await manager.load(abortController.signal, () => {
-        setLoadingProgress(manager.loadingProgress());
-      });
+      try {
+        const { updateActions } = await manager.load(abortController.signal, () => {
+          if (!abortController.signal.aborted) {
+            setLoadingProgress(manager.loadingProgress());
+          }
+        });
 
-      if (!abortController.signal.aborted) {
-        actions.current = updateActions;
-        setLoading(false);
+        if (!abortController.signal.aborted) {
+          actions.current = updateActions;
+          setLoading(false);
+        }
+      } catch {
+        if (abortController.signal.aborted) { return; }
+        abortController.abort();
+        setLoadFailed(true);
       }
     }
 
@@ -240,32 +249,38 @@ export function SceneLoader() {
   }, []);
 
   useEffect(() => {
-    if (!loadingProgress) { return; }
+    if (!loadingProgress || loadFailed) { return; }
 
     if (loadingProgress.isDoneLoading()) {
       if (!isDebug()) {
-        setTimeout(() => { setShowProgress(false); }, 100);
-        setTimeout(() => {
+        const progressTimer = setTimeout(() => { setShowProgress(false); }, 100);
+        const messageTimer = setTimeout(() => {
           setLoadingUnderscore(false);
           // If a user has a mobile phone with a small screen, display the warning
           // Otherwise we just hide it
           if (!isMobileDevice()) { setShowMessage(false); }
         }, 700);
+
+        return () => {
+          clearTimeout(progressTimer);
+          clearTimeout(messageTimer);
+        };
       } else {
         setShowMessage(false);
         setShowProgress(false);
         setLoadingUnderscore(false);
       }
     }
-  }, [loadingProgress]);
+  }, [loadingProgress, loadFailed]);
 
   if (supportsWebGL === null) { return <></>; }
   if (supportsWebGL === false) { return DisplayWebGLError(); }
+  if (loadFailed) { return DisplaySceneLoadError(); }
 
   return (<>
     {showProgress && loadingProgress && <DisplayLoadingProgress loadingProgress={loadingProgress} />}
     {showLoadingUnderscore && <LoadingUnderscore />}
-    {showMessage && <ShowUserMessage onClick={() => setShowMessage(false)} />}
+    {!loading && !showProgress && showMessage && <ShowUserMessage onClick={() => setShowMessage(false)} />}
     <Renderer
       loading={loading}
       showMessage={showMessage}

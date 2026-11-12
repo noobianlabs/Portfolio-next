@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import styles from './MenuBar.module.css';
 import { ApplicationManager, ApplicationManagerEvent, MenuEntry, MenuItem } from '@/applications/ApplicationManager';
 import { minimumDigits } from './util';
@@ -131,18 +131,23 @@ type MenuBarProps = {
   manager: ApplicationManager
 }
 
+function subscribeClock(onChange: () => void) {
+  const interval = setInterval(onChange, 1000);
+  return () => clearInterval(interval);
+}
+
+function getClockSnapshot() {
+  return Math.floor(Date.now() / 1000) * 1000;
+}
+
+function getServerClockSnapshot() {
+  return undefined;
+}
+
 const DateAndTime = () => {
   const { t, i18n } = useTranslation('common');
-  const [date, setDate] = useState<Date>();
-
-  useEffect(() => {
-    setDate(new Date());
-    const interval = setInterval(() => setDate(new Date()), 1000);
-
-    return () => {
-      clearInterval(interval);
-    }
-  }, []);
+  const timestamp = useSyncExternalStore(subscribeClock, getClockSnapshot, getServerClockSnapshot);
+  const date = timestamp === undefined ? undefined : new Date(timestamp);
 
   return (
     <div className={styles.date} data-locale={i18n.language}>

@@ -1,9 +1,24 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { MouseEvent, ReactNode } from 'react';
-import { mountPortfolioBridge, matchesProjectFilter, projectFromHash } from './discovery.mjs';
+import { embeddedContext, mountPortfolioBridge, matchesProjectFilter, projectFromHash } from './discovery.mjs';
 import { publicProjects } from './projects';
 import type { ProjectFilter } from './projects';
 import styles from '../../styles/Portfolio.module.css';
+
+const subscribeHydration = () => () => {};
+const getEnhancedSnapshot = () => true;
+const getServerSnapshot = () => false;
+const subscribeHash = (onChange: () => void) => {
+  window.addEventListener('hashchange', onChange);
+  return () => window.removeEventListener('hashchange', onChange);
+};
+const getHashSnapshot = () => window.location.hash;
+const getServerHashSnapshot = () => '';
+function getEmbeddedSnapshot() {
+  let parentHref = null;
+  try { parentHref = window.parent !== window ? window.parent.location.href : null; } catch { /* Cross-origin parents are not trusted. */ }
+  return Boolean(embeddedContext({ href: window.location.href, parentHref, isFramed: window.parent !== window }));
+}
 
 const filters: readonly { value: ProjectFilter; label: string }[] = [
   { value: 'all', label: 'All categories' },
@@ -17,10 +32,13 @@ function ExternalLink({ href, children, className }: { href: string; children: R
 
 export default function PortfolioReading() {
   const root = useRef<HTMLDivElement>(null);
-  const [enhanced, setEnhanced] = useState(false);
-  const [embedded, setEmbedded] = useState(false);
+  const enhanced = useSyncExternalStore(subscribeHydration, getEnhancedSnapshot, getServerSnapshot);
+  const embedded = useSyncExternalStore(subscribeHydration, getEmbeddedSnapshot, getServerSnapshot);
   const [filter, setFilter] = useState<ProjectFilter>('all');
   const [reveal, setReveal] = useState<{ id: string } | null>(null);
+  const hash = useSyncExternalStore(subscribeHash, getHashSnapshot, getServerHashSnapshot);
+  const initialProject = projectFromHash(hash, publicProjects);
+  const revealTarget = reveal ?? initialProject;
 
   const revealHash = useCallback(() => {
     const project = projectFromHash(window.location.hash, publicProjects);
@@ -33,12 +51,9 @@ export default function PortfolioReading() {
   useEffect(() => {
     const page = root.current;
     if (!page) return;
-    setEnhanced(true);
     window.addEventListener('hashchange', revealHash);
-    revealHash();
 
     const bridge = mountPortfolioBridge({ page, window });
-    setEmbedded(bridge.embedded);
     return () => {
       window.removeEventListener('hashchange', revealHash);
       bridge.cleanup();
@@ -46,16 +61,16 @@ export default function PortfolioReading() {
   }, [revealHash]);
 
   useEffect(() => {
-    if (!reveal) return;
+    if (!revealTarget) return;
     // Wait until React has restored the unfiltered article before focusing it.
     const article = root.current?.querySelectorAll<HTMLElement>('article[data-project-group]');
-    const card = Array.from(article || []).find(item => item.id === reveal.id);
+    const card = Array.from(article || []).find(item => item.id === revealTarget.id);
     if (!card) return;
     const details = card.querySelector('details');
     if (details) details.open = true;
     details?.querySelector('summary')?.focus({ preventScroll: true });
     card.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-  }, [reveal]);
+  }, [revealTarget]);
 
   function reopenCurrentHash(event: MouseEvent<HTMLAnchorElement>) {
     if (event.defaultPrevented || event.button !== 0 || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;

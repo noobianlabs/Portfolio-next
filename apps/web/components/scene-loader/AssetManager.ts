@@ -156,6 +156,7 @@ export class AssetManager {
   }
 
   public async load(signal?: AbortSignal, onUpdate?: () => void): LoadingResult {
+    if (signal?.aborted) { return { updateActions: [] }; }
     if (!this.context) { this.init(false); }
 
     let allUpdateActions: UpdateAction[] = [];
@@ -170,8 +171,10 @@ export class AssetManager {
 
         if (!downloader) { return; }
         if (asset.downloaded) { return; }
+        if (signal?.aborted) { return; }
 
         await downloader(this.context!);
+        if (signal?.aborted) { return; }
         asset.downloaded = true;
 
         update();
