@@ -122,11 +122,12 @@ function DockItemDirectory(item: DirectoryDockItem | FileDockItem, fileSystem: F
       data-drop-point="true"
       className={buttonStyle}
       onClick={() => item.onClick()}
+      aria-label={item.title}
       data-tooltip={item.title}>
       <img
         className={styles['dock-app-image']}
         src={item.icon.src}
-        alt={item.icon.alt}
+        alt=""
         width={64}
         height={64}
         draggable={false}
