@@ -68,12 +68,13 @@ test('actual detection safely handles canvas creation failure', () => {
 test('actual SceneLoader unsupported branch returns the tested panel before Renderer', () => {
   let stateIndex = 0;
   const { SceneLoader } = declarations('../apps/web/components/scene-loader/SceneLoader.tsx', ['SceneLoader'], {
-    useState(initial) { return [stateIndex++ === 6 ? false : initial, () => { throw Error('effects are not executed in this branch control'); }]; },
+    // Lazy scene state precedes loadingProgress/supportsWebGL: unsupported state is now eighth.
+    useState(initial) { return [stateIndex++ === 7 ? false : initial, () => { throw Error('effects are not executed in this branch control'); }]; },
     useRef(current) { return { current }; }, useEffect() {}, createRenderScenes: () => ({}),
     DisplayWebGLError, Renderer() { throw Error('unsupported branch must not render the GPU renderer'); },
   });
   assert.equal(renderToStaticMarkup(SceneLoader()), html());
-  assert.equal(stateIndex, 7);
+  assert.equal(stateIndex, 8);
 });
 test('actual unsupported detector result stops the startup effect before allocation', () => {
   const { detectWebGL } = declarations('../apps/web/components/scene-loader/util.ts', ['detectWebGL'], {

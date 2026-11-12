@@ -43,7 +43,7 @@ function fixture({ failAt, realInit = false } = {}) {
     });
   }
   const managerRef = { current: null }, actions = { current: [] };
-  const globals = { AbortController: class extends AbortController { constructor() { super(); controllers.push(this); } }, detectWebGL: () => true, setSupportsWebGL: value => supports.push(value), managerRef, scenesRef: { current: {} }, actions,
+  const globals = { AbortController: class extends AbortController { constructor() { super(); controllers.push(this); } }, detectWebGL: () => true, setSupportsWebGL: value => supports.push(value), managerRef, scenes: {}, actions,
     AssetManager: Manager, LoadingManager: class {}, isDebug: () => false,
     setLoadingProgress: value => updates.push(value), setLoadFailed: value => failures.push(value), setLoading: value => loading.push(value),
   };

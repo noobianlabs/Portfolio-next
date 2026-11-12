@@ -188,7 +188,7 @@ export function SceneLoader() {
   const [showMessage, setShowMessage] = useState(true);
   const [showLoadingUnderscore, setLoadingUnderscore] = useState(true);
 
-  const scenesRef = useRef<RendererScenes>(createRenderScenes());
+  const [scenes] = useState<RendererScenes>(createRenderScenes);
   const managerRef = useRef<AssetManager | null>(null);
   const actions = useRef<UpdateAction[]>([]);
 
@@ -204,7 +204,7 @@ export function SceneLoader() {
 
     const fetchData = async () => {
       try {
-        managerRef.current = new AssetManager(scenesRef.current, new LoadingManager())
+        managerRef.current = new AssetManager(scenes, new LoadingManager())
         const manager = managerRef.current;
 
         manager.init(isDebug());
@@ -247,7 +247,7 @@ export function SceneLoader() {
     return () => {
       abortController.abort();
     }
-  }, []);
+  }, [scenes]);
 
   useEffect(() => {
     if (!loadingProgress || loadFailed) { return; }
@@ -286,7 +286,7 @@ export function SceneLoader() {
       loading={loading}
       showMessage={showMessage}
 
-      scenes={scenesRef.current}
+      scenes={scenes}
       actions={actions.current}
     />
   </>);
