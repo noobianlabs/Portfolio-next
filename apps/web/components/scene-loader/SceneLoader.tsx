@@ -120,11 +120,12 @@ function ShowBios() {
 
 function DisplayWebGLError() {
   return (
-    <div className={styles['loading-progress']}>
+    <div className={styles['loading-progress']} style={{ overflowY: 'auto' }}>
       <OperatingSystemStats />
       <div className={styles['error-container']}>
         <h3>ERROR: No WebGL detected</h3>
-        <p>WebGL is required to run this site.</p>
+        <p>WebGL is required to run the interactive scene.</p>
+        <p><a href="/portfolio">Read my portfolio without WebGL</a>.</p>
         <p>Please enable it or switch to a browser that supports WebGL</p>
         <p>Or if you want to download my CV, you can do so from <a href="/assets/cv/Abdullah_Saleh_resume.pdf" target="_blank">here</a>.</p>
       </div>
