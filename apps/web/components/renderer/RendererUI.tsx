@@ -58,8 +58,8 @@ function SoundManagementButton(props: { sound: SubViewSound }) {
   const icon = isSoundEnabled ? "/icons/mute-icon.svg" : "/icons/unmute-icon.svg"
 
   return (
-    <button className={styles['mute-button']} onClick={() => toggleSound()}>
-      <img draggable={false} src={icon} width={25} height={20} />
+    <button className={styles['mute-button']} aria-label={isSoundEnabled ? 'Mute sound' : 'Unmute sound'} onClick={() => toggleSound()}>
+      <img draggable={false} src={icon} width={25} height={20} alt="" />
     </button>
   )
 }
@@ -75,8 +75,8 @@ function ChangeSceneButton(props: { targetState: CameraHandlerState, cameraHandl
   }
 
   return (
-    <button className={styles['camera-button']} onClick={() => changeScene()}>
-      <img draggable={false} src={icon} width={25} height={20} />
+    <button className={styles['camera-button']} aria-label={targetState === CameraHandlerState.MonitorView ? 'View the computer' : targetState === CameraHandlerState.Cinematic ? 'View the room' : 'Change camera view'} onClick={() => changeScene()}>
+      <img draggable={false} src={icon} width={25} height={20} alt="" />
     </button>
   );
 }
