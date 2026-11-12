@@ -26,8 +26,16 @@ const filters: readonly { value: ProjectFilter; label: string }[] = [
   { value: 'community', label: 'Community & advocacy' },
 ];
 
+function DecorativeArrow({ down = false }: { down?: boolean }) {
+  return (
+    <svg width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" style={{ verticalAlign: '-0.125em' }}>
+      <path d={down ? 'M4 4l8 8M4 12h8V4' : 'M4 12l8-8M4 4h8v8'} />
+    </svg>
+  );
+}
+
 function ExternalLink({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
-  return <a href={href} target="_blank" rel="noopener noreferrer" className={className}>{children} <span aria-hidden="true">↗</span><span className={styles.srOnly}> (opens in a new tab)</span></a>;
+  return <a href={href} target="_blank" rel="noopener noreferrer" className={className}>{children} <span aria-hidden="true"><DecorativeArrow /></span><span className={styles.srOnly}> (opens in a new tab)</span></a>;
 }
 
 export default function PortfolioReading() {
@@ -123,7 +131,7 @@ export default function PortfolioReading() {
               <article key={project.id} id={project.id} className={styles.project} data-project-group={project.group} hidden={!matchesProjectFilter(project, filter)} aria-labelledby={`${project.id}-heading`}>
                 <div className={styles.projectIdentity}>
                   <div className={styles.projectMeta}><span>{String(index + 1).padStart(2, '0')}</span><span>{project.category}</span></div>
-                  <h3 id={`${project.id}-heading`}><a className={styles.projectTitleLink} href={`#${project.id}`} onClick={reopenCurrentHash}>{project.title} <span className={styles.projectLinkMark} aria-hidden="true">↘</span></a></h3>
+                  <h3 id={`${project.id}-heading`}><a className={styles.projectTitleLink} href={`#${project.id}`} onClick={reopenCurrentHash}>{project.title} <span className={styles.projectLinkMark} aria-hidden="true"><DecorativeArrow down /></span></a></h3>
                   <p className={styles.workType}><span>{project.status}</span><ExternalLink href={project.source}>{project.sourceLabel || 'Source notes'}</ExternalLink></p>
                 </div>
                 <div className={styles.projectBody}>

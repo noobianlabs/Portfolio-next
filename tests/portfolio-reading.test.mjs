@@ -213,3 +213,42 @@ test('standalone and untrusted embedding are readable but never send frame comma
     bridge.cleanup();
   }
 });
+
+function assertDecorativeVector(anchor) {
+  const marks = [...anchor.matchAll(/<svg\b([^>]*)>([\s\S]*?)<\/svg>/g)];
+  assert.equal(marks.length, 1, 'the decorative direction mark renders without a font glyph');
+  const [, attributes, drawing] = marks[0];
+  assert.match(attributes, /aria-hidden="true"/, 'decoration must not change the accessible link name');
+  assert.match(attributes, /focusable="false"/, 'decoration must not add a keyboard stop');
+  assert.doesNotMatch(attributes, /tabindex=/i);
+  assert.match(attributes, /viewBox="[^"]+"/);
+  assert.match(attributes + drawing, /stroke="currentColor"/);
+  assert.match(drawing, /<path\b[^>]*\bd="[^"]*\d[^"]*"/, 'the direction mark has nonempty path geometry');
+  assert.doesNotMatch(drawing, /<(?:text|image|use)\b/, 'the mark is self-contained vector geometry');
+  assert.doesNotMatch(anchor, /[↗↘]/);
+}
+
+test('external links retain labels and destinations with font-independent decorative arrows', () => {
+  const html = renderReadingPage();
+  const links = [...html.matchAll(/<a\b[^>]*target="_blank"[^>]*>[\s\S]*?<\/a>/g)].map(match => match[0]);
+  assert.equal(links.length, 17);
+  for (const link of links) {
+    assert.match(link, /href="https:\/\/[^"]+"/);
+    assert.match(link, /rel="noopener noreferrer"/);
+    assert.match(link, /\(opens in a new tab\)/);
+    assertDecorativeVector(link);
+  }
+});
+
+test('project links keep exact fragments and visible titles without font-dependent direction marks', () => {
+  const html = renderReadingPage();
+  const links = [...html.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/g)].map(match => match[1]);
+  const ids = ['habibi-tech', 'cvs-health', 'for-our-liberation', 'ibm-maximo', 'sudanese-resistance-front', 'interactive-portfolio'];
+  const titles = ['Habibi Tech demos', 'CVS AI/ML prototypes', 'For Our Liberation', 'IBM Maximo', 'Sudanese Resistance Front', 'A portfolio you can inhabit'];
+  assert.equal(links.length, ids.length);
+  links.forEach((link, index) => {
+    assert.ok(link.includes('href="#' + ids[index] + '"'));
+    assert.equal(link.replace(/<[^>]+>/g, '').trim(), titles[index], 'the exact project title remains visible text');
+    assertDecorativeVector(link);
+  });
+});
