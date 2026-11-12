@@ -89,6 +89,7 @@ function NameAndTime(props: {
   const { state, cameraHandler, sound } = props;
 
   const firstTime = useRef<boolean>(true);
+  const cancelContent = useRef<(() => void) | null>(null);
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
   const [time, setTime] = useState("");
@@ -97,49 +98,69 @@ function NameAndTime(props: {
 
   const isActive = state === CameraHandlerState.FreeRoam;
 
-  function formatTime(dateTime: Date): string {
-    const hours = String(dateTime.getHours()).padStart(2, '0');
-    const minutes = String(dateTime.getMinutes()).padStart(2, '0');
-    const seconds = String(dateTime.getSeconds()).padStart(2, '0');
+  useEffect(() => {
+    return () => {
+      cancelContent.current?.();
+      cancelContent.current = null;
+      firstTime.current = true;
+    };
+  }, []);
 
-    return `${hours}:${minutes}:${seconds}`;
-  }
+  useEffect(() => {
+    if (!isActive || !firstTime.current) { return; }
+    firstTime.current = false;
 
-  function writeOutContent() {
+    let cancelled = false;
+    const timeouts = new Set<ReturnType<typeof setTimeout>>();
+    const cancelWriters: (() => void)[] = [];
+    let interval: ReturnType<typeof setInterval> | undefined;
+
+    function schedule(callback: () => void, delay: number) {
+      const handle = setTimeout(() => {
+        timeouts.delete(handle);
+        if (!cancelled) { callback(); }
+      }, delay);
+      timeouts.add(handle);
+    }
+
+    function formatTime(dateTime: Date): string {
+      const hours = String(dateTime.getHours()).padStart(2, '0');
+      const minutes = String(dateTime.getMinutes()).padStart(2, '0');
+      const seconds = String(dateTime.getSeconds()).padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
+    }
+
     function writeAfterDelay(stream: () => string, setter: (value: string) => void, charDelay: number): void {
-      setTimeout(() => writeOutCharsStreaming(stream, setter, MStoWriteChar), charDelay * MStoWriteChar);
+      schedule(() => {
+        cancelWriters.push(writeOutCharsStreaming(stream, setter, MStoWriteChar));
+      }, charDelay * MStoWriteChar);
     }
 
     const name = "Abdullah Saleh";
     const title = "people > profit";
 
-    // Write all the content
     writeAfterDelay(() => name, setName, 0);
     writeAfterDelay(() => title, setTitle, name.length + 1);
     writeAfterDelay(() => formatTime(new Date()), setTime, name.length + title.length + 2);
 
-    // After everything is done writing, start a loop to update the time
     const timeLength = 8;
     const totalWaitTime = (timeLength + name.length + title.length + 2) * MStoWriteChar;
-
-    setTimeout(() => {
-      setInterval(() => { setTime(formatTime(new Date())); }, 1000);
+    schedule(() => {
+      interval = setInterval(() => {
+        if (!cancelled) { setTime(formatTime(new Date())); }
+      }, 1000);
     }, totalWaitTime);
+    schedule(() => { setDone(true); }, totalWaitTime + MStoWriteChar);
 
-    setTimeout(() => {
-      setDone(true);
-    }, totalWaitTime + MStoWriteChar);
-  }
-
-  useEffect(() => {
-    if (!isActive) { return; }
-    const isFirstTime = firstTime.current;
-
-    if (isFirstTime) {
-      writeOutContent();
-      firstTime.current = false;
-    }
-  }, [state])
+    cancelContent.current = () => {
+      cancelled = true;
+      for (const handle of timeouts) { clearTimeout(handle); }
+      timeouts.clear();
+      for (const cancel of cancelWriters) { cancel(); }
+      if (interval !== undefined) { clearInterval(interval); }
+      interval = undefined;
+    };
+  }, [isActive]);
 
   return (
     <div className={joinStyles([
