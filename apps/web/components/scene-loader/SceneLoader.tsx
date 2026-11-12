@@ -151,7 +151,7 @@ function DisplayLoadingProgress(props: { loadingProgress: LoadingProgress }) {
   const loadingResources = ShowLoadingResources(loadingProgress);
 
   return (<>
-    <div className={styles['loading-progress']}>
+    <div className={styles['loading-progress']} style={{ overflowY: 'auto' }}>
       <OperatingSystemStats />
       <p><a href="/portfolio">Read my portfolio instead</a>.</p>
       <ShowBios />
