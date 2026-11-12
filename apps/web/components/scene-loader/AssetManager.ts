@@ -1,4 +1,4 @@
-import { LoadingManager, TextureLoader, WebGLRenderer } from "three";
+import { LoadingManager, TextureLoader } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { RendererScenes } from "../renderer/Renderer";
 import { sleep } from "./util";
@@ -34,7 +34,6 @@ type LoadingResult = Promise<{updateActions: UpdateAction[]}>;
 export class AssetManagerContext {
   constructor(
     public debug: boolean,
-    public renderer: WebGLRenderer,
     public textureLoader: TextureLoader,
     public gltfLoader: GLTFLoader,
     public scenes: RendererScenes,
@@ -96,11 +95,9 @@ export class AssetManager {
   public init(debug: boolean): void {
     const textureLoader = new TextureLoader(this.loadingManager);
     const gltfLoader = new GLTFLoader(this.loadingManager);
-    const renderer = new WebGLRenderer();
 
     this.context = new AssetManagerContext(
       debug,
-      renderer,
       textureLoader,
       gltfLoader,
       this.rendererScenes
