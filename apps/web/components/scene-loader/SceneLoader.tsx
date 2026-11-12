@@ -200,31 +200,31 @@ export function SceneLoader() {
     setSupportsWebGL(hasWebGL);
     if (!hasWebGL) { return; }
 
-    managerRef.current = new AssetManager(scenesRef.current, new LoadingManager())
-    const manager = managerRef.current;
-
-    manager.init(isDebug());
-    manager.reset();
-
-    manager.add('Linked to Magi-1', NoopLoader());
-    manager.add('Linked to Magi-2', NoopLoader());
-    manager.add('Linked to Magi-3', NoopLoader());
-    manager.add('Loading desk', DeskLoader());
-    manager.add('Loading cables', CablesLoader());
-    manager.add('Loading mouse', MouseLoader());
-    manager.add('Loading lights', LightsLoader());
-    manager.add('Loading floor', FloorLoader());
-    manager.add('Loading plant', PlantLoader());
-    manager.add('Loading Alchemical Hydra', HydraLoader());
-    manager.add('Loading keyboard', KeyboardLoader());
-    manager.add('Loading monitor', MonitorLoader());
-
-    setLoadingProgress(managerRef.current.loadingProgress());
-
     const abortController = new AbortController();
 
     const fetchData = async () => {
       try {
+        managerRef.current = new AssetManager(scenesRef.current, new LoadingManager())
+        const manager = managerRef.current;
+
+        manager.init(isDebug());
+        manager.reset();
+
+        manager.add('Linked to Magi-1', NoopLoader());
+        manager.add('Linked to Magi-2', NoopLoader());
+        manager.add('Linked to Magi-3', NoopLoader());
+        manager.add('Loading desk', DeskLoader());
+        manager.add('Loading cables', CablesLoader());
+        manager.add('Loading mouse', MouseLoader());
+        manager.add('Loading lights', LightsLoader());
+        manager.add('Loading floor', FloorLoader());
+        manager.add('Loading plant', PlantLoader());
+        manager.add('Loading Alchemical Hydra', HydraLoader());
+        manager.add('Loading keyboard', KeyboardLoader());
+        manager.add('Loading monitor', MonitorLoader());
+
+        setLoadingProgress(managerRef.current.loadingProgress());
+
         const { updateActions } = await manager.load(abortController.signal, () => {
           if (!abortController.signal.aborted) {
             setLoadingProgress(manager.loadingProgress());

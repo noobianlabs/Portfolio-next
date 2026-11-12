@@ -1,0 +1,90 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { runInNewContext } from 'node:vm';
+const require = createRequire(import.meta.url);
+const ts = require('typescript');
+function evaluate(code, globals) {
+  const output = ts.transpileModule(code, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;
+  const module = { exports: {} };
+  runInNewContext(output, { module, exports: module.exports, AbortController, ...globals });
+  return module.exports;
+}
+function astFile(relative) {
+  const source = readFileSync(new URL(relative, import.meta.url), 'utf8');
+  return ts.createSourceFile('source.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+}
+const sceneAST = astFile('../apps/web/components/scene-loader/SceneLoader.tsx');
+const scene = sceneAST.statements.find(n => ts.isFunctionDeclaration(n) && n.name?.text === 'SceneLoader');
+const firstEffect = scene.body.statements.find(n => ts.isExpressionStatement(n) && ts.isCallExpression(n.expression) && n.expression.expression.getText(sceneAST) === 'useEffect').expression.arguments[0].getText(sceneAST);
+const managerAST = astFile('../apps/web/components/scene-loader/AssetManager.ts');
+const managerClasses = managerAST.statements.filter(n => ts.isClassDeclaration(n) && ['AssetManager', 'AssetManagerContext'].includes(n.name?.text)).map(n => n.getText(managerAST)).join('\n');
+function fixture({ failAt, realInit = false } = {}) {
+  const events = [], updates = [], failures = [], loading = [], supports = [], controllers = [];
+  let resolve, reject, progressCallback, signal;
+  const pending = new Promise((yes, no) => { resolve = yes; reject = no; });
+  const progress = { label: 'progress' };
+  const step = name => { events.push(name); if (failAt === name) throw Error('controlled ' + name); };
+  class ControlledManager {
+    constructor() { step('constructor'); }
+    init() { step('init'); }
+    reset() { step('reset'); }
+    add(name) { step('add:' + name); }
+    loadingProgress() { step('progress'); return progress; }
+    load(received, callback) { step('load'); signal = received; progressCallback = callback; return pending; }
+  }
+  let Manager = ControlledManager;
+  if (realInit) {
+    Manager = evaluate(managerClasses + '\nmodule.exports = AssetManager;', {
+      TextureLoader: class { constructor() { events.push('texture'); } },
+      GLTFLoader: class { constructor() { events.push('gltf'); } },
+      WebGLRenderer: class { constructor() { events.push('renderer'); throw Error('controlled GPU constructor failure'); } },
+    });
+  }
+  const managerRef = { current: null }, actions = { current: [] };
+  const globals = { AbortController: class extends AbortController { constructor() { super(); controllers.push(this); } }, detectWebGL: () => true, setSupportsWebGL: value => supports.push(value), managerRef, scenesRef: { current: {} }, actions,
+    AssetManager: Manager, LoadingManager: class {}, isDebug: () => false,
+    setLoadingProgress: value => updates.push(value), setLoadFailed: value => failures.push(value), setLoading: value => loading.push(value),
+  };
+  for (const name of ['NoopLoader','DeskLoader','CablesLoader','MouseLoader','LightsLoader','FloorLoader','PlantLoader','HydraLoader','KeyboardLoader','MonitorLoader']) globals[name] = () => ({ name });
+  const start = evaluate('module.exports = ' + firstEffect, globals);
+  return { start, events, updates, failures, loading, supports, controllers, actions, resolve, reject, progress: () => progressCallback(), get signal() { return signal; } };
+}
+const settle = async () => { await Promise.resolve(); await Promise.resolve(); };
+test('real AssetManager init throwing at WebGLRenderer is recovered by the startup effect', async () => {
+  const f = fixture({ realInit: true });
+  let cleanup;
+  assert.doesNotThrow(() => { cleanup = f.start(); });
+  await settle();
+  assert.deepEqual(f.events, ['texture', 'gltf', 'renderer']);
+  assert.deepEqual(f.failures, [true]);
+  assert.deepEqual(f.loading, []);
+  assert.equal(f.controllers.length, 1); assert.equal(f.controllers[0].signal.aborted, true);
+  assert.equal(typeof cleanup, 'function');
+  cleanup();
+});
+for (const failAt of ['constructor','reset','add:Loading desk','progress']) test('startup failure is contained at ' + failAt, async () => {
+  const f = fixture({ failAt }); let cleanup;
+  assert.doesNotThrow(() => { cleanup = f.start(); }); await settle();
+  assert.deepEqual(f.failures, [true]); assert(!f.events.includes('load')); assert.equal(f.controllers.length, 1); assert.equal(f.controllers[0].signal.aborted, true); cleanup();
+});
+test('successful startup preserves setup order and publishes completion actions', async () => {
+  const f = fixture(); const cleanup = f.start();
+  assert.deepEqual(f.events, ['constructor','init','reset','add:Linked to Magi-1','add:Linked to Magi-2','add:Linked to Magi-3','add:Loading desk','add:Loading cables','add:Loading mouse','add:Loading lights','add:Loading floor','add:Loading plant','add:Loading Alchemical Hydra','add:Loading keyboard','add:Loading monitor','progress','load']);
+  const actions = [() => {}]; f.resolve({ updateActions: actions }); await settle();
+  assert.equal(f.actions.current, actions); assert.deepEqual(f.loading, [false]); assert.deepEqual(f.failures, []); cleanup(); assert.equal(f.signal.aborted, true);
+});
+test('load rejection marks startup failed and aborts the pending signal', async () => {
+  const f = fixture(); const cleanup = f.start(); f.reject(Error('controlled load failure')); await settle();
+  assert.deepEqual(f.failures, [true]); assert.equal(f.signal.aborted, true); cleanup();
+});
+test('cleanup suppresses late progress and completion after pending load', async () => {
+  const f = fixture(); const cleanup = f.start(); const before = f.updates.length; cleanup();
+  f.progress(); f.resolve({ updateActions: [() => {}] }); await settle();
+  assert.equal(f.updates.length, before); assert.equal(f.actions.current.length, 0); assert.deepEqual(f.loading, []); assert.deepEqual(f.failures, []);
+});
+test('cleanup suppresses a later load rejection', async () => {
+  const f = fixture(); const cleanup = f.start(); cleanup(); f.reject(Error('late rejection')); await settle();
+  assert.deepEqual(f.failures, []); assert.deepEqual(f.loading, []);
+});
